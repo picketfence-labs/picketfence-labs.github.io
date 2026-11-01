@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>AIエージェントとConnectivity | API + AI Summit Japan 2026</title><link rel="icon" href="./images/kong-mark.png"><link rel="stylesheet" href="./styles.css"></head>
+<body>
+<main id="viewport" aria-label="登壇スライド"><div id="stage">
+<section class="slide cover" id="title" data-title="AIエージェントとConnectivity">
+<img class="cover-pattern" src="./images/cover-pattern.png" alt=""><img class="cover-logo" src="./images/event-logo.png" alt="API + AI Summit '26">
+<h1>AIエージェントと<br>Connectivity</h1><div class="japan">Japan</div><p class="speaker-line">Ned Shawa / Shinichi Hashitani<br>Kong · 2026.11.19</p><img class="kong-mark" src="./images/kong-mark.png" alt="Kong"><span class="draft-tag">DRAFT 02</span>
+</section>
+<section class="slide speakers" id="speakers" data-title="自己紹介 · 2名">
+<article class="speaker-card"><h2 class="gradient">Ned Shawa</h2><img class="portrait-placeholder" src="./images/ned-shawa.png" alt="Ned Shawa"><p>肩書・紹介文は後続反映</p></article><article class="speaker-card second"><h2 class="gradient">Shinichi Hashitani</h2><img class="portrait-placeholder" src="./images/shinichi-hashitani.png" alt="Shinichi Hashitani"><p>肩書・紹介文は後続反映</p></article>
+</section>
+<section class="slide standard" id="connectivity" data-title="接続を、点から面へ" data-component="connectivity">
+<div id="connectivity-host"></div>
+<template id="connectivity-template">
+<style>
+/* P3: HTML cards keep text legible while SVG carries only routes and packets. */
+:host{display:block;position:absolute;inset:0;background:#000}
+:host .c-canvas{position:absolute;left:100px;top:55px;width:1400px;height:760px;font-family:'Funnel Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;color:#fff}
+:host .c-canvas *{box-sizing:border-box}
+:host .c-title{position:absolute;left:36px;top:20px;font-size:38px;font-weight:700;line-height:1.2}
+:host .c-sentence{position:absolute;left:36px;top:91px;font-size:22px;color:#cdd4cb;line-height:1.3}
+:host .c-guide{position:absolute;height:1px;background:#4a4d49;opacity:.45}
+:host .c-guide-top{left:36px;top:140px;width:1330px}
+:host .c-guide-bottom{left:36px;top:690px;width:1330px}
+:host .c-caption{position:absolute;left:36px;top:713px;color:#ccff00;font-size:23px;font-weight:700;line-height:1.3}
+:host .c-plane{position:absolute;left:36px;top:183px;width:1328px;height:500px;border:2px solid #ccff00;border-radius:8px;background:rgba(0,20,8,.16)}
+:host .c-plane-title{position:absolute;left:22px;top:15px;color:#ccff00;font-size:18px;font-weight:800;letter-spacing:2px}
+:host .c-control{position:absolute;top:192px;height:39px;border:1.5px solid #ccff00;border-radius:5px;background:#001408;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700}
+:host #c-control{left:681px;width:185px}:host #c-observe{left:880px;width:133px}:host #c-cost{left:1027px;width:173px}
+:host .c-route-layer{position:absolute;inset:0;width:1400px;height:760px;overflow:visible;pointer-events:none}
+:host .c-route{fill:none;stroke:#cdd4cb;stroke-width:2;stroke-dasharray:7 7;stroke-linecap:butt}
+:host .c-route.is-drawing,:host .c-route.is-travel{stroke:#ccff00;stroke-width:4;stroke-dasharray:none}
+:host .c-route.c-current{stroke:#ccff00;stroke-width:3}
+:host(.c-governed) .c-route{stroke:#ccff00}
+:host .c-packet circle{fill:#ccff00}:host .c-packet .c-packet-core{fill:#001408}
+:host .c-node{position:absolute;background:#1a1f1b;border:2px solid #4a4d49;border-radius:8px;padding:25px 26px}
+:host .c-node.c-active{border-color:#ccff00}
+:host .c-node strong{display:block;font-size:24px;font-weight:700;line-height:1.25}
+:host .c-node>span{display:block;color:#cdd4cb;font-size:16px;margin-top:10px}
+:host .c-agent{left:545px;top:290px;width:300px;height:245px}
+:host .c-agent-row{position:absolute;left:26px;width:244px;height:41px;border:1.5px solid #4a4d49;border-radius:4px;background:#001408;padding:8px 16px;font-size:17px;color:#cdd4cb}
+:host .c-agent-request{top:107px}:host .c-agent-result{top:161px}
+:host(.is-request) .c-agent-request,:host(.is-result) .c-agent-result{border:2px solid #ccff00;background:#22351b;color:#fff;font-weight:700}
+:host #c-openai{left:75px;top:280px;width:280px;height:250px;border-radius:22px}
+:host #c-openai .c-openai-big-tag{font-size:15px;font-weight:700;letter-spacing:1px;margin-top:13px}
+:host #c-openai .c-llm-role{font-size:17px;margin-top:22px}
+:host #c-openai .c-openai-small-tag{position:absolute;right:26px;top:20px;font-size:15px;font-weight:700;letter-spacing:1px;margin:0;opacity:0}
+:host #c-claude{top:275px}:host #c-gemini{top:470px}:host #c-local{top:565px}
+:host .c-model:not(#c-openai){left:75px;width:280px;height:72px;padding:18px 26px;display:flex;align-items:center;justify-content:space-between}
+:host .c-model:not(#c-openai)>span{font-size:15px;font-weight:700;letter-spacing:1px;margin:0}
+:host #c-api{left:1135px;top:380px;width:180px;height:100px;padding:17px 18px}
+:host #c-mcp{left:885px;top:380px;width:200px;height:100px;padding:17px 18px}
+:host #c-api>span,:host #c-mcp>span{margin-top:4px}
+:host #c-peer{left:545px;top:595px;width:300px;height:80px;padding:13px 26px}
+:host #c-peer>span{margin-top:2px}
+:host #c-flow-note{position:absolute;left:373px;top:334px;width:150px;text-align:center;white-space:nowrap;color:#cdd4cb;font-size:16px;font-weight:700}
+:host #c-flow-note span{display:block}:host #c-flow-note span+span{margin-top:82px}
+:host .c-hidden{opacity:0;pointer-events:none}:host .c-hidden.c-visible{opacity:1}
+:host .c-node.is-pulsing{border-color:#ccff00;border-width:4px}</style>
+<div class="c-canvas" role="img" aria-label="一つのAIエージェントからLLM、API、MCP、他のエージェントへ接続が広がる">
+<div class="c-title"></div><div class="c-sentence"></div><div class="c-guide c-guide-top"></div><div class="c-guide c-guide-bottom"></div><div class="c-caption"></div>
+<div id="c-plane" class="c-plane c-hidden"><span class="c-plane-title">AI CONNECTIVITY</span></div>
+<div id="c-control" class="c-control c-hidden">アクセス制御</div><div id="c-observe" class="c-control c-hidden">観測</div><div id="c-cost" class="c-control c-hidden">コスト管理</div>
+<svg class="c-route-layer" viewBox="0 0 1400 760" aria-hidden="true"><g class="c-routes">
+  <path id="c-route-openai" class="c-route c-hidden" d="M545 411H355"/>
+  <path id="c-route-claude" class="c-route c-hidden" d="M545 411H445V311H355"/>
+  <path id="c-route-gemini" class="c-route c-hidden" d="M545 411H445V506H355"/>
+  <path id="c-route-local" class="c-route c-hidden" d="M545 411H445V601H355"/>
+  <path id="c-route-mcp" class="c-route c-hidden" d="M845 430H885"/>
+  <path id="c-route-api" class="c-route c-hidden" d="M1085 430H1135"/>
+  <path id="c-route-peer" class="c-route c-hidden" d="M695 535V595"/>
+</g><g id="c-packet" class="c-packet c-hidden"><circle r="11"/><circle class="c-packet-core" r="4"/></g></svg>
+<div id="c-agent" class="c-node c-agent"><strong>AIエージェント</strong><span>判断し、次の処理を進める</span><div class="c-agent-row c-agent-request">指示とルールを送る</div><div class="c-agent-row c-agent-result">処理結果を受け取る</div></div>
+<div id="c-openai" class="c-node c-model c-hidden"><strong>OpenAI</strong><span class="c-openai-big-tag">LLM</span><span class="c-llm-role">推論・生成</span><span class="c-openai-small-tag">LLM</span></div>
+<div id="c-claude" class="c-node c-model c-hidden"><strong>Claude</strong><span>LLM</span></div><div id="c-gemini" class="c-node c-model c-hidden"><strong>Gemini</strong><span>LLM</span></div><div id="c-local" class="c-node c-model c-hidden"><strong>ローカルモデル</strong><span>LLM</span></div>
+<div id="c-mcp" class="c-node c-hidden"><strong>MCP</strong><span>Toolとコンテキスト</span></div><div id="c-api" class="c-node c-hidden"><strong>API</strong><span>業務データと操作</span></div>
+<div id="c-peer" class="c-node c-hidden"><strong>他のAIエージェント</strong><span>Agent同士の通信</span></div>
+<div id="c-flow-note" class="c-hidden"><span>指示・ルール</span><span>処理結果</span></div>
+</div>
+</template>
+</section>
+<section class="slide standard connectivity-value-slide" id="connectivity-value" data-title="AI Connectivityを面で捉える" data-component="connectivityValue">
+<p class="eyebrow">AI CONNECTIVITY / WHY KONG</p>
+<h2>AIをスケールさせるには、接続を<span class="accent">面で捉える。</span></h2>
+<p class="value-intro">Agent、LLM、MCPを個別に増やすだけでは、制御も運用も分散する。</p>
+<div class="step-list"><span>1 点ごとの対応</span><span>2 全経路を面で捉える</span><span>3 Kong + Konnect</span></div>
+<svg class="diagram connectivity-value-diagram" viewBox="0 0 1448 430" role="img" aria-label="左は接続ごとに分かれた個別の制御。右はKong AI Connectivityの基盤がAgentとLLM、Agent同士、AgentとMCPとAPIの接続を面として捉え、その上でKonnectが企業全体の管理と運用を提供する">
+<g class="value-points" data-part="points"><rect class="value-outline" x="20" y="90" width="445" height="330" rx="8"/><text class="value-heading" x="45" y="126">点ごとの対応</text>
+<g class="value-point-row"><rect x="44" y="154" width="398" height="61" rx="6"/><text x="66" y="190">Agent → LLM</text><text class="value-small" x="304" y="190">個別の制御</text></g>
+<g class="value-point-row"><rect x="44" y="235" width="398" height="61" rx="6"/><text x="66" y="271">Agent → MCP → API</text><text class="value-small" x="304" y="271">個別の制御</text></g>
+<g class="value-point-row"><rect x="44" y="316" width="398" height="61" rx="6"/><text x="66" y="352">Agent ↔ Agent</text><text class="value-small" x="304" y="352">個別の制御</text></g>
+<text class="value-warning" x="45" y="402">増えるほど、運用が部分最適に</text></g>
+<path class="value-transition" d="M485 252H550"/><path class="value-arrowhead" d="M550 252l-13 -9v18z"/>
+<g class="value-konnect" data-part="konnect" data-reveal="2"><rect class="value-konnect-box" x="575" y="2" width="830" height="66" rx="7"/><text class="value-konnect-name" x="600" y="43">Konnect</text><text class="value-konnect-detail" x="824" y="42">企業全体の管理・運用</text><path class="value-management" d="M990 68V90"/></g>
+<g class="value-plane" data-part="plane" data-reveal="1"><rect class="value-plane-box" x="575" y="90" width="830" height="330" rx="8"/><text class="value-plane-label" x="600" y="125">KONG AI CONNECTIVITY</text>
+<g class="value-lane"><rect x="600" y="145" width="780" height="68" rx="5"/><rect class="value-node" x="620" y="157" width="145" height="44" rx="5"/><text x="649" y="185">Agent</text><path class="value-route" d="M765 179H1180"/><rect class="value-node" x="1180" y="157" width="175" height="44" rx="5"/><text x="1237" y="185">LLM</text></g>
+<g class="value-lane"><rect x="600" y="222" width="780" height="68" rx="5"/><rect class="value-node" x="620" y="234" width="145" height="44" rx="5"/><text x="649" y="262">Agent</text><path class="value-route" d="M765 256H1180"/><rect class="value-node" x="1180" y="234" width="175" height="44" rx="5"/><text x="1205" y="262">別のAgent</text></g>
+<g class="value-lane"><rect x="600" y="299" width="780" height="68" rx="5"/><rect class="value-node" x="620" y="311" width="145" height="44" rx="5"/><text x="649" y="339">Agent</text><path class="value-route" d="M765 333H970M1100 333H1210"/><rect class="value-node" x="970" y="311" width="130" height="44" rx="5"/><text x="1007" y="339">MCP</text><rect class="value-node" x="1210" y="311" width="145" height="44" rx="5"/><text x="1265" y="339">API</text></g>
+<rect class="value-controls" x="600" y="382" width="780" height="27" rx="4"/><text class="value-controls-label" x="624" y="402">アクセス制御</text><text class="value-controls-label" x="915" y="402">観測</text><text class="value-controls-label" x="1135" y="402">コスト管理</text></g>
+</svg>
+<p class="scene-caption"></p>
+<p class="source"><a href="https://konghq.com/products/kong-konnect" target="_blank" rel="noopener">Kong Konnect</a> · <a href="https://developer.konghq.com/ai-gateway/architecture/" target="_blank" rel="noopener">AI Gateway architecture</a></p>
+</section>
+<section class="slide divider" id="llm" data-title="01 · LLM Connectivity"><p class="eyebrow">01</p><h2 class="gradient">LLM Connectivity</h2><p class="subline">安全に使い、コストを理解する。</p></section>
+<section class="slide standard" id="guardrails" data-title="LLMの切替・フェイルオーバー・ガードレール" data-component="gateway">
+<div id="gateway-host" role="img" aria-label="AIエージェントからAI Gatewayを通り、モデル切替、フェイルオーバー、PIIマスキング、危険な要求のブロックを示す"></div>
+<template id="gateway-template"><style>
+/* P5: P3 card language; geometry animates without a scaled text layer. */
+:host{display:block;position:absolute;inset:0;background:#000}
+:host .g-canvas{position:absolute;left:100px;top:55px;width:1400px;height:760px;font-family:'Funnel Sans','Hiragino Kaku Gothic ProN','Yu Gothic',sans-serif;color:#fff}
+:host .g-canvas *{box-sizing:border-box}
+:host .g-title{position:absolute;left:36px;top:20px;font-size:38px;font-weight:700;line-height:1.2}
+:host .g-sentence{position:absolute;left:36px;top:91px;font-size:22px;color:#cdd4cb;line-height:1.3}
+:host .g-guide{position:absolute;height:1px;background:#4a4d49;opacity:.45}
+:host .g-guide-top{left:36px;top:140px;width:1330px}
+:host .g-guide-bottom{left:36px;top:690px;width:1330px}
+:host .g-route-layer{position:absolute;inset:0;width:1400px;height:760px;overflow:visible;pointer-events:none}
+:host .g-route{fill:none;stroke:#768274;stroke-width:2;stroke-dasharray:7 7;stroke-linecap:butt}
+:host .g-route.g-hot{stroke:#ccff00;stroke-width:4;stroke-dasharray:none}
+:host .g-route.g-failed{stroke:#ff936d;stroke-width:4;stroke-dasharray:none}
+:host .g-node{position:absolute;background:#1a1f1b;border:2px solid #4a4d49;border-radius:8px;padding:18px 23px}
+:host .g-node strong{display:block;font-size:24px;font-weight:700;line-height:1.2}
+:host .g-node>span{display:block;color:#cdd4cb;font-size:16px;margin-top:5px}
+:host .g-node.g-active{border-color:#ccff00;box-shadow:0 0 0 1px #ccff0033}
+:host .g-node.g-error{border-color:#ff936d}
+:host .g-node.g-error>span{color:#ffb497}
+:host .g-node.g-muted{opacity:.38}
+:host #g-agent{padding:21px 23px}
+:host #g-agent .g-agent-sub{margin-top:8px}
+:host #g-agent .g-agent-data{margin-top:10px;padding:7px 9px;border:1px solid #586456;border-radius:4px;font-size:15px;line-height:1.25;white-space:pre-line}
+:host #g-gateway{padding:21px 20px}
+:host #g-gateway .g-gateway-state{margin-top:13px;padding:7px 8px;border:1px solid #6d865c;border-radius:4px;color:#ccff00;font-size:16px;font-weight:700;white-space:nowrap}
+:host .g-model{padding:12px 23px;display:flex;align-items:center;justify-content:space-between;gap:9px}
+:host .g-model strong{font-size:22px;max-width:80%;overflow-wrap:anywhere}
+:host .g-model>span{font-size:14px;font-weight:700;margin:0;white-space:nowrap}
+:host #g-model-1.g-receiving{display:block;padding:16px 21px}
+:host #g-model-1.g-receiving strong{max-width:none}
+:host #g-model-1.g-receiving>span{position:absolute;right:20px;top:18px}
+:host #g-received{position:absolute;left:20px;right:20px;top:55px;padding:6px 8px;border:1px solid #6d865c;border-radius:4px;background:#07180d;color:#ccff00;font-size:14px;line-height:1.25;white-space:pre-line}
+:host .g-service{left:1105px;width:275px;height:100px;padding:18px 21px}
+:host .g-service strong{font-size:21px}
+:host .g-service span{font-size:15px}
+:host #g-sanitizer{top:180px}:host #g-guard{top:560px}
+:host .g-hidden{opacity:0;pointer-events:none}
+:host .g-hidden.g-visible{opacity:1;pointer-events:auto}
+:host .g-notice{position:absolute;left:1155px;top:385px;width:215px;min-height:63px;border:2px solid #ccff00;border-radius:7px;background:#07180d;padding:11px 18px;font-size:19px;font-weight:700;line-height:1.2}
+:host .g-notice span{display:block;font-size:14px;font-weight:500;color:#cdd4cb;margin-top:4px}
+:host #g-packet circle{fill:#ccff00}:host #g-packet.g-alert circle{fill:#ff936d}
+:host #g-packet text{fill:#ccff00;paint-order:stroke;stroke:#000;stroke-width:3;font-size:15px;font-weight:800;text-anchor:middle}
+:host .g-caption{position:absolute;left:36px;top:713px;color:#ccff00;font-size:23px;font-weight:700}</style>
+<div class="g-canvas">
+<div id="g-title" class="g-title"></div><div id="g-sentence" class="g-sentence"></div><div class="g-guide g-guide-top"></div><div class="g-guide g-guide-bottom"></div>
+<svg class="g-route-layer" viewBox="0 0 1400 760" aria-hidden="true"><g>
+<path id="g-route-agent" class="g-route" d="M800 410H730"/>
+<path id="g-route-0" class="g-route" d="M500 410H440V286H330"/>
+<path id="g-route-1" class="g-route" d="M500 410H440V381H330"/>
+<path id="g-route-2" class="g-route g-hidden" d="M500 410H440V476H330"/>
+<path id="g-route-sanitizer" class="g-route g-hidden" d="M615 315V230H1105"/>
+<path id="g-route-guard" class="g-route g-hidden" d="M615 505V580H1105"/>
+</g><g id="g-packet" class="g-hidden"><circle r="10"/><text id="g-packet-label" y="-15"></text></g></svg>
+<div id="g-agent" class="g-node"><strong>AIエージェント</strong><span class="g-agent-sub">判断し、次の処理を進める</span><div id="g-agent-data" class="g-agent-data"></div></div>
+<div id="g-gateway" class="g-node"><strong>Kong AI Gateway</strong><span>同じ接続の入口</span><div id="g-gateway-state" class="g-gateway-state"></div></div>
+<div id="g-model-0" class="g-node g-model"><strong>Claude Opus</strong><span>LLM</span></div>
+<div id="g-model-1" class="g-node g-model"><strong>OpenAI Sol</strong><span>LLM</span><div id="g-received" class="g-hidden"></div></div>
+<div id="g-model-2" class="g-node g-model g-hidden"><strong>Gemini Flash</strong><span>LLM</span></div>
+<div id="g-sanitizer" class="g-node g-service g-hidden"><strong>AI PII Sanitizer</strong><span>外部PIIサービスで伏せ字に</span></div>
+<div id="g-guard" class="g-node g-service g-hidden"><strong>外部Guardrail</strong><span>Azure Content Safety または Lakera Guard</span></div>
+<div id="g-block" class="g-notice g-hidden">BLOCK<span>LLMへ転送しない</span></div>
+<div id="g-caption" class="g-caption"></div>
+</div></template>
+<p class="source"><a href="https://developer.konghq.com/ai-gateway/entities/ai-model/" target="_blank" rel="noopener">AI Models</a> · <a href="https://developer.konghq.com/ai-gateway/policies/ai-sanitizer/" target="_blank" rel="noopener">AI PII Sanitizer</a> · <a href="https://developer.konghq.com/ai-gateway/ai-data-gov/" target="_blank" rel="noopener">AI guardrails</a></p>
+</section>
+<section class="slide standard" id="cost-demo" data-title="DEMO 1 · AI Cost Management" data-demo="AI Cost Management">
+<p class="eyebrow">AI COST MANAGEMENT</p><h2>費用の総額から、使い道の理解へ。</h2><div class="columns"><article><p class="number">01 / OBSERVE</p><h3>誰が使ったか</h3><p>チーム・アプリケーション・<br>エージェントに結びつける。</p></article><article><p class="number">02 / PLAN</p><h3>予算内か</h3><p>利用の実績を、<br>業務の予算と照らし合わせる。</p></article><article><p class="number">03 / ACT</p><h3>次に何を変えるか</h3><p>増加の理由を理解し、<br>運用の判断につなげる。</p></article></div><div class="demo-callout"><span>DEMO 01</span>Konnect Cost Managementの画面へ</div><p class="source"><a href="https://konghq.com/products/ai-cost-management" target="_blank" rel="noopener">Source: Kong AI Cost Management</a></p>
+</section>
+<section class="slide standard cost-summary" id="cost-flow" data-title="全社のAIコストを把握し、負担まで設計する">
+<p class="eyebrow">AFTER THE DEMO / AI COST MANAGEMENT</p>
+<h2>AIコストを、全社で把握し、<span class="accent">負担まで設計する。</span></h2>
+<p class="cost-lead">デモで見た価値は、利用情報を集め、組織の単位で見て、費用のルールを決められること。</p>
+<div class="cost-pillars" aria-label="Cost Managementのデモ後に伝える3つの要点">
+<article class="cost-pillar"><p class="cost-kicker">01 / COLLECT</p><h3>Konnectに<br>つなぐだけで</h3><p>モデルをまたぐ利用・コスト情報を集約。</p></article>
+<article class="cost-pillar"><p class="cost-kicker">02 / SEE</p><h3>組織横断で<br>見える</h3><p>個人・チームの利用単位を定義し、状況を把握。</p></article>
+<article class="cost-pillar"><p class="cost-kicker">03 / ALLOCATE</p><h3>価格と負担を<br>決める</h3><p>プライスリストを定義し、費用の配賦に使う。</p></article>
+</div>
+<div class="cost-examples"><p class="cost-examples-title">柔軟なチャージバック</p><p>本部が一部を負担し、残りをチームへ</p><p>自社運用モデルにも価格を設定し、公開モデルと同じように配賦</p></div>
+<p class="source"><a href="https://konghq.com/products/ai-cost-management" target="_blank" rel="noopener">Kong AI Cost Management</a> · <a href="https://developer.konghq.com/metering-and-billing/cost-analytics/" target="_blank" rel="noopener">Cost Analytics</a> · チャージバック例は運用設計のイメージ</p>
+</section>
+<section class="slide divider" id="context" data-title="02 · Context"><p class="eyebrow">02</p><h2 class="gradient">Context</h2><p class="subline">エージェントが必要な情報に、届くために。</p></section>
+<section class="slide standard" id="context-mcp" data-title="MCPの動作とContext Sprawl / Bloat" data-component="p1"><div class="context-stage"><div id="p1-host"></div></div></section>
+<section class="slide standard" id="context-value" data-title="Context Meshの価値 · DEMO 2" data-demo="Context Mesh">
+<p class="eyebrow">CONTEXT MESH</p><h2>必要なコンテキストを、使える形で。</h2><div class="columns"><article><p class="number">01 / CONNECT</p><h3>散在する接続を<br>まとめる</h3><p>複数のAPIやMCP Serverを、<br>エージェントが使う<br>共通の入口に。</p></article><article><p class="number">02 / COMPOSE</p><h3>データ加工を<br>コード処理</h3><p>複数APIの呼び出しと加工を<br>Code Mode MCPで<br>集約処理。</p></article><article><p class="number">03 / RETURN</p><h3>必要な結果を<br>返す</h3><p>中間データの往復を抑え、<br>エージェントに渡す<br>コンテキストを整える。</p></article></div><div class="demo-callout"><span>DEMO 02</span>Chat UIで保険の申込・契約・請求を扱う</div><p class="source"><a href="https://developer.konghq.com/context-mesh/" target="_blank" rel="noopener">Source: Kong Context Mesh Docs</a></p>
+</section>
+<section class="slide standard" id="context-result" data-title="デモの結果 · 商品ごとの成立率">
+<p class="eyebrow">AFTER THE DEMO / INSURANCE</p><h2>別々のAPIから、ひとつの業務回答へ。</h2>
+<div class="demo-result"><div class="result-copy"><p class="prompt-label">デモの質問 I-1</p><blockquote>商品ごとの申込・契約を集計し、<br>成立率の高い順に上位5商品を。</blockquote><div class="result-formula"><span>申込</span><b>＋</b><span>契約</span><b>＋</b><span>商品</span></div><p>商品IDでまとめ、<br>契約件数 ÷ 申込件数を計算。</p><p class="result-number"><strong>74.07<span>%</span></strong><br>自動車保険：40契約 / 54申込</p><p class="result-note">提供キャプチャの実行例。<br>架空の保険データによるデモ。</p></div><figure><a href="./images/context-mesh-demo-screen.png" target="_blank" rel="noopener"><img src="./images/context-mesh-demo-screen.png" alt="利用者提供のContext Mesh Chat Demo。申込・契約のAPIを集計し、自動車保険74.07%など上位5商品の成立率を表示。"></a><figcaption>利用者提供の実行キャプチャ · 画像を開くと拡大</figcaption></figure></div>
+<p class="source"><a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/TEST_INSURANCE.md" target="_blank" rel="noopener">Source: TEST_INSURANCE / I-1 · 本番実演の結果を固定するものではありません</a></p></section>
+<section class="slide standard motion-slide" id="context-code" data-title="Search ToolとCode Mode MCP" data-component="code">
+<p class="eyebrow">AFTER THE DEMO / CONTEXT MESH</p><h2>必要なToolを探し、データを処理して返す。</h2>
+<div class="step-list"><span>1 Search Tool</span><span>2 コードを渡す</span><span>3 APIを呼ぶ</span><span>4 集約・加工</span><span>5 結果を返す</span></div>
+<svg class="diagram code-diagram" viewBox="0 0 1448 420" role="img" aria-label="AgentとContext Meshを1本で接続。Search Toolが必要かつアクセス可能なToolを返し、Code Mode MCPが複数APIの結果を加工して必要な結果だけ返す">
+<path class="code-line code-agent-line" d="M300 230H378"/><path class="code-line code-internal" d="M378 230H406M406 150V290M406 150H430M406 290H430"/>
+<path class="code-line code-api-line" d="M955 296H1050V96H1127M1050 201H1127M1050 309H1127"/><path class="code-active-route" opacity="0"/><path class="code-return-route" d="M430 340H406V230H300" opacity="0"/>
+<rect class="code-node code-agent" x="48" y="158" width="252" height="144" rx="7"/><text class="code-heading" x="75" y="201">AI Agent / LLM</text><text class="code-muted" x="75" y="231">質問・コードを組み立てる</text><g class="code-agent-answer"><rect x="74" y="248" width="202" height="37" rx="3"/><text x="88" y="273">成立率 上位5商品</text></g>
+<rect class="code-boundary" x="378" y="35" width="626" height="357" rx="9"/><text class="code-boundary-label" x="402" y="68">CONTEXT MESH</text>
+<g data-part="search"><rect class="code-node" x="430" y="93" width="525" height="105" rx="6"/><text class="code-heading" x="455" y="128">Search Tool</text><text class="code-muted" x="455" y="158">必要かつアクセス可能なToolを返す</text><g class="code-tool-chips"><rect x="455" y="169" width="112" height="20" rx="3"/><text x="464" y="184">申込</text><rect x="575" y="169" width="112" height="20" rx="3"/><text x="584" y="184">契約</text><rect x="695" y="169" width="112" height="20" rx="3"/><text x="704" y="184">商品</text></g></g>
+<g data-part="runtime"><rect class="code-node" x="430" y="221" width="525" height="150" rx="6"/><text class="code-heading" x="455" y="255">Code Mode MCP</text><text class="code-muted" x="455" y="282">受け取ったデータ処理のコードを実行する</text><g class="code-snippet"><rect x="455" y="301" width="353" height="32" rx="3"/><text x="466" y="322">groupBy(product_id) → count → rate → top5</text></g><g class="code-raw"><rect x="455" y="303" width="112" height="28" rx="3"/><text x="465" y="323">申込 300件</text><rect x="575" y="303" width="112" height="28" rx="3"/><text x="585" y="323">契約 200件</text><rect x="695" y="303" width="112" height="28" rx="3"/><text x="705" y="323">商品 5件</text></g><g class="code-processed"><rect x="455" y="337" width="470" height="24" rx="3"/><text x="466" y="354">商品IDで集計 → 成立率を計算・並べ替え</text></g></g>
+<g class="code-api" data-api="0"><rect class="code-node" x="1127" y="58" width="267" height="76" rx="6"/><text class="code-heading" x="1151" y="90">申込 API</text><text class="code-muted" x="1151" y="116">申込データ</text></g>
+<g class="code-api" data-api="1"><rect class="code-node" x="1127" y="164" width="267" height="76" rx="6"/><text class="code-heading" x="1151" y="196">契約 API</text><text class="code-muted" x="1151" y="222">契約データ</text></g>
+<g class="code-api" data-api="2"><rect class="code-node" x="1127" y="272" width="267" height="76" rx="6"/><text class="code-heading" x="1151" y="304">商品 API</text><text class="code-muted" x="1151" y="330">商品データ</text></g>
+<g class="code-motion" opacity="0"><g class="code-motion-stack"><rect x="-37" y="-19" width="72" height="24" rx="3"/><rect x="-30" y="-13" width="72" height="24" rx="3"/></g><rect class="code-motion-card" x="-27" y="-11" width="54" height="22" rx="4"/><text text-anchor="middle" y="4">REQ</text></g>
+</svg><p class="scene-caption"></p>
+<p class="source"><a href="https://developer.konghq.com/context-mesh/" target="_blank" rel="noopener">Kong Context Mesh Docs</a> · <a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/TEST_INSURANCE.md" target="_blank" rel="noopener">保険デモ I-1</a> · 取得件数は提供例</p>
+</section>
+<section class="slide standard motion-slide" id="context-architecture" data-title="Context Meshの配置と通信経路" data-component="architecture">
+<p class="eyebrow">CONTEXT MESH / HOW IT WORKS</p><h2>GatewayとMCP Serverは、別のPodで動く。</h2>
+<div class="step-list"><span>1 Konnect CP</span><span>2 Kong Operator</span><span>3 Agent → DP</span><span>4 MCP → API</span><span>5 結果を返す</span></div>
+<svg class="diagram architecture-diagram" viewBox="0 0 1448 465" role="img" aria-label="Konnect Control PlaneからOperatorへ構成を渡し、Data Plane Podへ設定を同期。Kubernetes Clusterの別Podで動くData PlaneとCode Mode MCPが、Agentおよび業務APIの通信を中継する">
+<g data-part="control"><rect class="arch-node arch-control" x="430" y="5" width="580" height="88" rx="7"/><text class="arch-heading" x="455" y="41">Konnect / Control Plane</text><text class="arch-muted" x="455" y="71">Source・MCP Server・Gateway設定</text></g>
+<rect class="arch-cluster" x="260" y="130" width="900" height="325" rx="8"/><text class="arch-cluster-label" x="280" y="159">KUBERNETES CLUSTER</text>
+<path class="arch-management" d="M505 93V174M482 247V306M615 210H773V284H810"/><path class="arch-config" d="M740 93V282H625V306"/>
+<text class="arch-route-label" x="514" y="118">Konnect API</text><text class="arch-route-label" x="754" y="117">設定同期 / WSS</text>
+<g data-part="operator"><rect class="arch-node" x="350" y="174" width="265" height="73" rx="6"/><text class="arch-heading" x="371" y="206">Kong Operator</text><text class="arch-muted" x="371" y="231">Podを配置・管理</text></g>
+<text class="arch-route-label" x="665" y="201">Podの管理</text>
+<g data-part="agent"><rect class="arch-node" x="20" y="314" width="205" height="100" rx="6"/><text class="arch-heading" x="43" y="353">AI Agent</text><text class="arch-muted" x="43" y="382">MCP Client</text></g>
+<path class="arch-traffic" d="M225 364H370M640 346H810M640 390V430H1185V364H1210"/>
+<g data-part="gateway"><rect class="arch-node" x="370" y="306" width="270" height="108" rx="6"/><text class="arch-heading" x="393" y="342">Data Plane Pod</text><text class="arch-muted" x="393" y="370">Kong Gateway</text><text class="arch-mini" x="393" y="397">MCP・API通信を中継</text></g>
+<g data-part="server"><rect class="arch-pod" x="810" y="215" width="320" height="172" rx="6"/><text class="arch-heading" x="831" y="246">MCP Server Pod</text><rect class="arch-sandbox" x="831" y="262" width="278" height="39" rx="3"/><text class="arch-mini" x="842" y="279">Init container</text><text class="arch-mini" x="960" y="290">生成コードを取得</text><rect class="arch-sandbox" x="831" y="307" width="278" height="64" rx="3"/><text class="arch-mini" x="842" y="327">Runner container / Code Mode MCP</text><text class="arch-mini" x="842" y="355">プロセス内Sandboxでコード実行</text></g>
+<g data-part="apis"><rect class="arch-node" x="1210" y="314" width="210" height="100" rx="6"/><text class="arch-heading" x="1233" y="353">業務 API</text><text class="arch-muted" x="1233" y="382">業務データ</text></g>
+<text class="arch-route-label" x="249" y="353">MCP要求</text><text class="arch-route-label" x="674" y="335">MCP</text><text class="arch-route-label" x="905" y="417">API呼出しもData Plane経由</text>
+</svg><p class="scene-caption"></p>
+<p class="source"><a href="https://developer.konghq.com/context-mesh/get-started/" target="_blank" rel="noopener">Context Mesh導入ガイド</a> · <a href="https://developer.konghq.com/operator/reference/architecture/" target="_blank" rel="noopener">Kong Operator構成</a> · <a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/CODE_MODE.md" target="_blank" rel="noopener">Code Mode実装分析</a></p>
+</section>
+<section class="slide standard" id="context-takeaway" data-title="コンテキストを設計する">
+<p class="eyebrow">CONTEXT / TAKEAWAY</p><h2>コンテキストは、量より設計。</h2><p class="big-statement closing-emphasis">何にアクセスできるか？<br>どこで処理するか？<br><span class="accent">何をエージェントへ返すか？</span></p>
+</section>
+<section class="slide divider" id="future" data-title="03 · AI Connectivityのこれから"><p class="eyebrow">03</p><h2 class="gradient">AI Connectivityのこれから</h2><p class="subline">個々の接続から、組織の基盤へ。</p></section>
+<section class="slide standard" id="whole" data-title="AIエコシステムを面で支える">
+<p class="eyebrow">THE AI CONNECTIVITY COMPANY</p><h2>AIエコシステムを、面で支える。</h2><div class="columns"><article><p class="number">AGENT ↔ LLM</p><h3>推論・生成への接続</h3><p>モデルを利用する際の<br>ガードレールと<br>コスト管理。</p></article><article><p class="number">AGENT ↔ AGENT</p><h3>協調するための接続</h3><p>複数のエージェントが<br>連携する世界も、<br>全体像に含める。</p></article><article><p class="number">AGENT ↔ API</p><h3>コンテキストへの接続</h3><p>必要な情報を探し、<br>処理し、使える形で<br>エージェントへ届ける。</p></article></div><p class="takeaway">接続先が増えても、制御と運用を個々の実装に閉じ込めない。</p>
+</section>
+<section class="slide standard" id="closing" data-title="点の導入から、面でのスケールへ">
+<p class="eyebrow">AI AGENTS × CONNECTIVITY</p><h2>点の導入から、面でのスケールへ。</h2><p class="big-statement closing-emphasis">いまのAIエージェントに、<br><span class="accent">足りない接続は何ですか。</span></p><p class="subline" style="margin-top:64px!important">モデル。エージェント。APIとコンテキスト。<br>その全体を、AI Connectivityとして考える。</p>
+</section>
+<section class="slide ending" id="thanks" data-title="Thank You"><div class="thanks-panel"><h2 class="gradient">Thank You</h2></div></section>
+</div></main>
+<div id="progress"></div>
+<nav id="toolbar" aria-label="スライド操作"><button id="menu-button" aria-label="スライド一覧">一覧</button><span id="position"></span><select id="step-select" aria-label="ページ内の停止状態" hidden></select><button id="previous" aria-label="前の状態またはページ">↑ 前へ</button><button id="next" class="primary" aria-label="次の状態またはページ">次へ ↓</button><button id="replay" hidden>再演</button><button id="pause-button" class="optional">デモ／中断</button><span id="status" role="status"></span><button id="fullscreen" class="optional">全画面</button><button id="help-button" aria-label="操作方法">?</button></nav>
+<dialog id="menu"><button class="close" data-close>閉じる</button><h2>スライド一覧</h2><div id="slide-menu"></div></dialog>
+<dialog id="help"><button class="close" data-close>閉じる</button><h2>操作方法</h2><p><kbd>↓</kbd> <kbd>Space</kbd> <kbd>PageDown</kbd> 次の状態／ページ<br><kbd>↑</kbd> <kbd>PageUp</kbd> 前の状態／ページ<br><kbd>R</kbd> 現在の動きを再演<br><kbd>M</kbd> 一覧　<kbd>F</kbd> 全画面　<kbd>B</kbd> デモ／中断</p><p>ページ内アニメーションは各段階で停止します。最終状態から次へ進むと次ページへ移ります。前へ・一覧への移動は再生中でも動作を中止できます。</p><p>デモ中断や別画面への切替では現在の段階を保持します。戻った後に「再演」も可能です。ホイールは1操作ごと、タッチは上下スワイプで移動します。</p></dialog>
+<div id="pause-screen" hidden><h2>デモ／中断</h2><p>現在のページと停止状態を保持しています。</p><button id="resume">スライドに戻る</button></div><div id="live" aria-live="polite"></div>
+<script type="module" src="./deck.js"></script></body></html>
