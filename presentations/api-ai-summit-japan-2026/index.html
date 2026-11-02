@@ -82,20 +82,29 @@
 <section class="slide standard connectivity-value-slide" id="connectivity-value" data-title="点の導入を、面で支える" data-component="connectivityValue">
 <div class="v-canvas">
   <h2>AIをスケールさせるには、接続を<span class="accent">面で捉える。</span></h2>
-  <p class="v-sentence">エージェントごとの導入が増えるほど、制御と運用は分かれていく。</p>
+  <p class="v-sentence">プロジェクトごとの接続を、企業全体で使える共通の接続へ。</p>
   <div class="v-guide v-guide-top"></div><div class="v-guide v-guide-bottom"></div>
-  <div class="v-konnect"><strong>Konnect</strong><span>企業全体の管理・運用</span></div>
-  <div class="v-plane"><span>KONG AI CONNECTIVITY</span></div>
-  <div class="v-consequences"><span>部分最適</span><span>横断的な状況が見えない</span><span>展開のたびに運用が増える</span></div>
-  <div class="v-stack" data-stack="0"><div class="v-stack-heading">Amazon Bedrock AgentCore</div><div class="v-node v-agent">AIエージェント</div><div class="v-node v-target">LLM</div><div class="v-local">このスタックの設定</div></div>
-  <div class="v-stack" data-stack="1"><div class="v-stack-heading">GitHub Copilot</div><div class="v-node v-agent">AIエージェント</div><div class="v-node v-target">LLM / Tool</div><div class="v-local">このスタックの設定</div></div>
-  <div class="v-stack" data-stack="2"><div class="v-stack-heading">部門独自のAgent</div><div class="v-node v-agent">AIエージェント</div><div class="v-node v-target">MCP → API</div><div class="v-local">このスタックの設定</div></div>
-  <div class="v-fragments"><span>独自の制御・観測・費用管理</span><span>独自の制御・観測・費用管理</span><span>独自の制御・観測・費用管理</span></div>
-  <div class="v-shared"><span>アクセス制御　・　観測　・　コスト管理</span></div>
-  <svg class="v-routes" viewBox="0 0 1400 760" aria-hidden="true">
-    <path class="v-local-route" data-route="0" d="M223 426H294"/><path class="v-local-route" data-route="1" d="M668 426H739"/><path class="v-local-route" data-route="2" d="M1113 426H1184"/>
-    <path class="v-cover-route" data-cover="0" d="M255 560V589"/><path class="v-cover-route" data-cover="1" d="M700 560V589"/><path class="v-cover-route" data-cover="2" d="M1145 560V589"/>
-    <path class="v-management" d="M700 240V246"/><circle class="v-packet" r="9"/>
+  <div class="v2-kicker">既存のプロジェクト</div><div class="v2-target-kicker">再利用できる接続先</div>
+  <div class="v2-project" data-project="0">Amazon Bedrock AgentCore</div>
+  <div class="v2-project" data-project="1">GitHub Copilot</div>
+  <div class="v2-project" data-project="2">部門独自のAgent</div>
+  <div class="v2-project v2-new" data-project="3">新しいAgent</div>
+  <div class="v2-target" data-target="openai">OpenAI</div>
+  <div class="v2-target" data-target="mcp-a">MCP A</div>
+  <div class="v2-target" data-target="claude">Claude</div>
+  <div class="v2-target" data-target="api">API</div>
+  <div class="v2-target" data-target="gemini">Gemini</div>
+  <div class="v2-target" data-target="mcp-b">MCP B</div>
+  <div class="v2-fragment" data-fragment="0">個別の制御</div><div class="v2-fragment" data-fragment="1">個別の制御</div><div class="v2-fragment" data-fragment="2">個別の制御</div>
+  <div class="v2-pain"><span>接続先ごとに設定が増える</span><span>横断的な状況が見えない</span><span>全体最適ができない</span></div>
+  <div class="v2-plane"><strong>KONG AI CONNECTIVITY</strong></div>
+  <div class="v2-lane" data-lane="llm">LLM 接続</div><div class="v2-lane" data-lane="mcp">MCP 接続</div><div class="v2-lane" data-lane="api">API 接続</div>
+  <div class="v2-govern"><span>アクセス制御</span><span>観測</span><span>コスト管理</span></div>
+  <div class="v2-konnect"><strong>Konnect</strong><span>企業全体で管理・運用</span></div>
+  <svg class="v2-routes" viewBox="0 0 1400 760" aria-hidden="true">
+    <g class="v2-local-routes"><path d="M260 306V360H170V410"/><path d="M260 306V360H342V410"/><path d="M700 306V360H610V410"/><path d="M700 306V360H782V410"/><path d="M1140 306V360H1050V410"/><path d="M1140 306V360H1222V410"/></g>
+    <g class="v2-network-routes"><path class="v2-input" d="M360 281H474"/><path class="v2-input" d="M360 381H474"/><path class="v2-input" d="M360 481H474"/><path class="v2-input v2-new-route" d="M360 581H474"/><path class="v2-spine" d="M474 281V581"/><path class="v2-output" d="M474 330H1020V283H1335M1095 283V302M1215 283V302M1335 283V302"/><path class="v2-output" d="M474 460H1020V415H1285M1145 415V432M1285 415V432"/><path class="v2-output" d="M474 590H1150"/></g>
+    <circle class="v2-packet" r="8"/>
   </svg>
   <p class="v-caption" aria-live="polite"></p>
 </div>

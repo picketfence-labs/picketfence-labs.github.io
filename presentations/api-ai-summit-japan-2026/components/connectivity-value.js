@@ -1,34 +1,38 @@
-/** P4: keep heterogeneous stacks fixed; reveal the missing common scope, then cover it. */
+/** P4: local point integrations become shared connection capabilities. */
 export function mountConnectivityValue(slide, onChange = () => {}) {
-  const states = ['個別の導入', '接続も設定も個別', '横断できない', '全体を面でカバー', 'Konnectで企業全体を運用'];
+  const states = ['一つのプロジェクト', '点ごとの接続', '個別最適の限界', '接続先を抽象化', '横断的なガバナンス', '既存構成を活かして展開'];
   const captions = [
-    '一つの導入から始まる。',
-    'ランタイムも接続先も違い、制御をそれぞれに作っていく。',
-    '点ごとの対応を重ねても、全体最適と横断ガバナンスには届かない。',
-    'Kongは異なるスタックを残したまま、接続全体を面として捉える。',
-    '共通のConnectivity基盤を、Konnectで企業全体の管理・運用につなぐ。'
+    '一つのプロジェクトが、自分の接続先を選んで始まる。',
+    'プロジェクトごとにLLM・MCP・APIへの接続を作っていく。',
+    '接続と制御が点在すると、横断的な可視化と全体最適が難しい。',
+    'Agentを活かしたまま、LLM・MCP・APIへの接続先を共通の層で整理する。',
+    '共通の接続を軸に、アクセス制御・観測・コスト管理を横断して適用する。',
+    '既存の接続先を再利用し、新しいAgentも柔軟に加えられる。'
   ];
-  const stacks = [...slide.querySelectorAll('.v-stack')];
-  const paths = [...slide.querySelectorAll('.v-local-route')];
-  const cover = [...slide.querySelectorAll('.v-cover-route')];
-  const packet = slide.querySelector('.v-packet');
-  const plane = slide.querySelector('.v-plane');
-  const shared = slide.querySelector('.v-shared');
+  const localPaths = [...slide.querySelectorAll('.v2-local-routes path')];
+  const networkPaths = [...slide.querySelectorAll('.v2-network-routes path:not(.v2-new-route)')];
+  const newPath = slide.querySelector('.v2-new-route');
+  const plane = slide.querySelector('.v2-plane');
+  const packet = slide.querySelector('.v2-packet');
   const caption = slide.querySelector('.v-caption');
   let step = 0, busy = false, generation = 0, frame = null, settle = null;
   const snapshot = () => ({step, busy, count: states.length, title: states[step]});
   const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function render() {
+  function render(ready = true) {
     slide.dataset.step = String(step);
     slide.dataset.busy = String(busy);
-    slide.classList.toggle('v-routes-ready', step >= 1);
+    slide.classList.toggle('is-expanded', step >= 1);
+    slide.classList.toggle('is-network', step >= 3);
+    slide.classList.toggle('v2-network-ready', step >= 3 && ready);
+    slide.classList.toggle('is-governed', step >= 4);
+    slide.classList.toggle('is-flex', step >= 5);
     caption.textContent = captions[step];
-    stacks.forEach(stack => stack.classList.remove('is-hot'));
-    paths.forEach(path => path.classList.remove('is-hot'));
+    plane.style.clipPath = step >= 3 && ready ? 'inset(0 0 0 0)' : '';
+    for (const path of [...networkPaths, newPath]) {
+      path.style.strokeDasharray = '';
+      path.style.strokeDashoffset = '';
+    }
     packet.style.opacity = '0';
-    plane.style.clipPath = '';
-    shared.style.clipPath = '';
-    cover.forEach(path => { path.style.strokeDasharray = ''; path.style.strokeDashoffset = ''; });
     onChange(snapshot());
   }
   function animate(duration, token, paint) {
@@ -46,7 +50,7 @@ export function mountConnectivityValue(slide, onChange = () => {}) {
       frame = requestAnimationFrame(tick);
     });
   }
-  async function pause(ms, token) { return animate(ms, token, () => {}); }
+  const pause = (ms, token) => animate(ms, token, () => {});
   async function move(path, token, duration) {
     const length = path.getTotalLength();
     packet.style.opacity = '1';
@@ -77,48 +81,46 @@ export function mountConnectivityValue(slide, onChange = () => {}) {
     step++;
     const token = ++generation;
     busy = true;
-    slide.dataset.step = String(step);
-    slide.dataset.busy = 'true';
-    caption.textContent = captions[step];
-    onChange(snapshot());
+    render(step !== 3);
     let ok = true;
     if (!reduced() && step === 1) {
-      ok = await pause(900, token);
-      if (ok) slide.classList.add('v-routes-ready');
-      for (let i = 0; i < paths.length && ok; i++) {
-        stacks[i].classList.add('is-hot');
-        paths[i].classList.add('is-hot');
-        ok = await move(paths[i], token, 660);
-        if (ok) ok = await pause(210, token);
-        stacks[i].classList.remove('is-hot');
-        paths[i].classList.remove('is-hot');
+      ok = await pause(550, token);
+      for (const path of localPaths.slice(2)) {
+        if (!ok) break;
+        ok = await move(path, token, 430);
       }
     } else if (!reduced() && step === 2) {
-      // The separated strips show that a policy or metric cannot cross the gaps.
-      ok = await pause(680, token);
-    } else if (!reduced() && step === 3) {
-      plane.style.clipPath = 'inset(0 100% 0 0)';
-      shared.style.clipPath = 'inset(0 100% 0 0)';
-      ok = await animate(1300, token, t => {
-        const inset = `inset(0 ${100 * (1 - t)}% 0 0)`;
-        plane.style.clipPath = inset;
-        shared.style.clipPath = inset;
-      });
-      for (const path of cover) {
-        if (!ok) break;
-        const length = path.getTotalLength();
-        path.style.strokeDasharray = String(length);
-        ok = await animate(320, token, t => { path.style.strokeDashoffset = String(length * (1 - t)); });
+      ok = await pause(850, token);
+    } else if (step === 3) {
+      if (!reduced()) ok = await pause(1120, token);
+      if (ok) {
+        slide.classList.add('v2-network-ready');
+        if (!reduced()) {
+          plane.style.clipPath = 'inset(0 100% 0 0)';
+          ok = await animate(850, token, t => {
+            plane.style.clipPath = `inset(0 ${100 * (1 - t)}% 0 0)`;
+          });
+          const lengths = networkPaths.map(path => path.getTotalLength());
+          networkPaths.forEach((path, i) => { path.style.strokeDasharray = String(lengths[i]); });
+          if (ok) ok = await animate(1050, token, t => {
+            networkPaths.forEach((path, i) => { path.style.strokeDashoffset = String(lengths[i] * (1 - t)); });
+          });
+        }
       }
     } else if (!reduced() && step === 4) {
-      ok = await pause(700, token);
+      ok = await pause(650, token);
+    } else if (!reduced() && step === 5) {
+      ok = await pause(550, token);
+      if (ok) ok = await move(newPath, token, 850);
     }
     if (token !== generation || !ok) return false;
     busy = false;
     render();
     return true;
   }
+  slide.classList.add('v2-initializing');
   render();
+  requestAnimationFrame(() => slide.classList.remove('v2-initializing'));
   return {
     next: () => play(),
     previous() { if (step === 0) return false; jump(step - 1); return true; },
