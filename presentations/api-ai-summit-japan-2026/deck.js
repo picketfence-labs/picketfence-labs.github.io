@@ -1,7 +1,7 @@
 import {mountP1} from './components/p1.js';
 import {mountSequence, sequences} from './components/sequence.js';
 import {mountConnectivity} from './components/connectivity.js';
-import {mountConnectivityValue} from './components/connectivity-value.js';
+import {mountConnectivityValue} from './components/connectivity-value.js?v=20261102-p4b';
 import {mountGateway} from './components/gateway.js';
 import {mountContextCode} from './components/context-code.js';
 
