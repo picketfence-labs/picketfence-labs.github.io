@@ -92,18 +92,19 @@
   <div class="v2-target" data-target="openai">OpenAI</div>
   <div class="v2-target" data-target="mcp-a">MCP A</div>
   <div class="v2-target" data-target="claude">Claude</div>
-  <div class="v2-target" data-target="api">API</div>
-  <div class="v2-target" data-target="gemini">Gemini</div>
   <div class="v2-target" data-target="mcp-b">MCP B</div>
+  <div class="v2-target" data-target="gemini">Gemini</div>
+  <div class="v2-target" data-target="mcp-c">MCP C</div>
+  <div class="v2-target v2-api-target" data-target="api">API</div>
   <div class="v2-fragment" data-fragment="0">個別の制御</div><div class="v2-fragment" data-fragment="1">個別の制御</div><div class="v2-fragment" data-fragment="2">個別の制御</div>
-  <div class="v2-pain"><span>接続先ごとに設定が増える</span><span>横断的な状況が見えない</span><span>全体最適ができない</span></div>
+  <div class="v2-pain">設定が重複 <span aria-hidden="true">→</span> 状況を横断して見られない <span aria-hidden="true">→</span> 全体最適が難しい</div>
   <div class="v2-plane"><strong>KONG AI CONNECTIVITY</strong></div>
-  <div class="v2-lane" data-lane="llm">LLM 接続</div><div class="v2-lane" data-lane="mcp">MCP 接続</div><div class="v2-lane" data-lane="api">API 接続</div>
+  <div class="v2-lane" data-lane="llm"><strong>LLM 接続</strong><span>モデルの選択・切替</span></div><div class="v2-lane" data-lane="mcp"><strong>MCP 接続</strong><span>Tool・APIへの経路</span></div>
   <div class="v2-govern"><span>アクセス制御</span><span>観測</span><span>コスト管理</span></div>
   <div class="v2-konnect"><strong>Konnect</strong><span>企業全体で管理・運用</span></div>
   <svg class="v2-routes" viewBox="0 0 1400 760" aria-hidden="true">
     <g class="v2-local-routes"><path d="M260 306V360H170V410"/><path d="M260 306V360H342V410"/><path d="M700 306V360H610V410"/><path d="M700 306V360H782V410"/><path d="M1140 306V360H1050V410"/><path d="M1140 306V360H1222V410"/></g>
-    <g class="v2-network-routes"><path class="v2-input" d="M360 281H474"/><path class="v2-input" d="M360 381H474"/><path class="v2-input" d="M360 481H474"/><path class="v2-input v2-new-route" d="M360 581H474"/><path class="v2-spine" d="M474 281V581"/><path class="v2-output" d="M474 330H1020V283H1335M1095 283V302M1215 283V302M1335 283V302"/><path class="v2-output" d="M474 460H1020V415H1285M1145 415V432M1285 415V432"/><path class="v2-output" d="M474 590H1150"/></g>
+    <g class="v2-network-routes"><path class="v2-input" d="M360 282H470"/><path class="v2-input" d="M360 382H470"/><path class="v2-input" d="M360 482H470"/><path class="v2-input v2-new-route" d="M360 582H470"/><path class="v2-spine" d="M470 282V582"/><path class="v2-lane-route" d="M470 345H520M470 485H520"/><path class="v2-output" d="M850 345H1010V275H1315M1075 275V302M1195 275V302M1315 275V302"/><path class="v2-output" d="M850 485H1010V430H1315M1075 430V460M1195 430V460M1315 430V460"/><path class="v2-api-chain" d="M1315 514V570"/></g>
     <circle class="v2-packet" r="8"/>
   </svg>
   <p class="v-caption" aria-live="polite"></p>

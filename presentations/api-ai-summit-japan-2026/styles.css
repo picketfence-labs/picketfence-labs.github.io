@@ -103,17 +103,20 @@
 .v2-project[data-project="3"]{left:90px;top:550px;opacity:0;transform:translateX(-65px);border-color:#ccff00}
 .v2-target{top:410px;width:140px;height:54px;font-size:18px}
 .v2-target[data-target="openai"]{left:100px}.v2-target[data-target="mcp-a"]{left:272px}
-.v2-target[data-target="claude"]{left:540px}.v2-target[data-target="api"]{left:712px}
-.v2-target[data-target="gemini"]{left:980px}.v2-target[data-target="mcp-b"]{left:1152px}
+.v2-target[data-target="claude"]{left:540px}.v2-target[data-target="mcp-b"]{left:712px}
+.v2-target[data-target="gemini"]{left:980px}.v2-target[data-target="mcp-c"]{left:1152px}
+.v2-api-target{left:1260px;top:570px;opacity:0}
 .v2-fragment{position:absolute;top:515px;width:170px;height:38px;border:1px dashed #a3ada0;border-radius:20px;background:#172017;color:#d0d8cc;font-size:17px;font-weight:700;display:grid;place-items:center;opacity:0;transition:opacity .35s,transform .5s;z-index:3}
 .v2-fragment[data-fragment="0"]{left:175px}.v2-fragment[data-fragment="1"]{left:615px}.v2-fragment[data-fragment="2"]{left:1055px}
-.v2-pain{position:absolute;left:70px;right:70px;top:608px;display:flex;justify-content:space-between;opacity:0;transition:opacity .4s;color:#ffae83;font-size:20px;font-weight:700}
-.v2-plane{position:absolute;left:409px;top:227px;width:610px;height:433px;box-sizing:border-box;border:2px solid #ccff00;border-radius:8px;background:#091a0c;opacity:0;clip-path:inset(0 100% 0 0);z-index:1}
+.v2-pain{position:absolute;left:220px;right:220px;top:601px;display:flex;align-items:center;justify-content:center;gap:17px;min-height:48px;border:1px solid #775a4a;border-radius:6px;background:#201510;opacity:0;transition:opacity .4s;color:#ffae83;font-size:20px;font-weight:700;white-space:nowrap}
+.v2-pain span{color:#ccff00;font-size:23px}
+.v2-plane{position:absolute;left:420px;top:220px;width:550px;height:420px;box-sizing:border-box;border:2px solid #ccff00;border-radius:8px;background:#091a0c;opacity:0;clip-path:inset(0 100% 0 0);z-index:1}
 .v2-plane strong{position:absolute;left:23px;top:16px;color:#ccff00;font-size:21px;letter-spacing:1.5px}
-.v2-lane{position:absolute;left:640px;width:190px;height:46px;box-sizing:border-box;display:grid;place-items:center;border:2px solid #84a275;border-radius:5px;background:#203421;color:#fff;font-size:19px;font-weight:700;opacity:0;z-index:3;transition:opacity .35s}
-.v2-lane[data-lane="llm"]{top:307px}.v2-lane[data-lane="mcp"]{top:437px}.v2-lane[data-lane="api"]{top:567px}
-.v2-govern{position:absolute;left:440px;top:610px;width:548px;height:40px;display:flex;align-items:center;justify-content:space-around;border:1px solid #ccff00;border-radius:5px;background:#243522;color:#ccff00;font-size:17px;font-weight:800;opacity:0;z-index:4;transition:opacity .45s,transform .45s;transform:translateY(24px)}
-.v2-konnect{position:absolute;left:409px;top:169px;width:610px;height:51px;box-sizing:border-box;border:2px solid #ccff00;border-radius:6px;background:#1b2a19;display:flex;align-items:center;justify-content:space-between;padding:0 20px;opacity:0;transform:translateY(-18px);transition:opacity .45s,transform .45s;z-index:3}
+.v2-lane{position:absolute;left:520px;width:330px;height:90px;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:2px solid #84a275;border-radius:6px;background:#203421;color:#fff;opacity:0;z-index:3;transition:opacity .35s}
+.v2-lane strong{font-size:23px}.v2-lane span{font-size:17px;color:#cdddc8;font-weight:600}
+.v2-lane[data-lane="llm"]{top:300px}.v2-lane[data-lane="mcp"]{top:440px}
+.v2-govern{position:absolute;left:485px;top:570px;width:420px;height:48px;display:flex;align-items:center;justify-content:space-around;border:1px solid #ccff00;border-radius:5px;background:#243522;color:#ccff00;font-size:17px;font-weight:800;opacity:0;z-index:4;transition:opacity .45s,transform .45s;transform:translateY(24px)}
+.v2-konnect{position:absolute;left:420px;top:160px;width:550px;height:51px;box-sizing:border-box;border:2px solid #ccff00;border-radius:6px;background:#1b2a19;display:flex;align-items:center;justify-content:space-between;padding:0 20px;opacity:0;transform:translateY(-18px);transition:opacity .45s,transform .45s;z-index:3}
 .v2-konnect strong{font-size:25px;color:#ccff00}.v2-konnect span{font-size:18px;font-weight:700}
 .v2-routes{position:absolute;inset:0;width:1400px;height:760px;pointer-events:none;overflow:visible;z-index:2}
 .v2-routes path{fill:none;stroke:#869584;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
@@ -129,12 +132,13 @@
 .connectivity-value-slide.is-network .v2-project[data-project="1"]{left:90px;top:350px}
 .connectivity-value-slide.is-network .v2-project[data-project="2"]{left:90px;top:450px}
 .connectivity-value-slide.is-network .v2-target{width:110px}
-.connectivity-value-slide.is-network .v2-target[data-target="openai"]{left:1040px;top:302px}
-.connectivity-value-slide.is-network .v2-target[data-target="claude"]{left:1160px;top:302px}
-.connectivity-value-slide.is-network .v2-target[data-target="gemini"]{left:1280px;top:302px}
-.connectivity-value-slide.is-network .v2-target[data-target="mcp-a"]{left:1090px;top:432px}
-.connectivity-value-slide.is-network .v2-target[data-target="mcp-b"]{left:1230px;top:432px}
-.connectivity-value-slide.is-network .v2-target[data-target="api"]{left:1150px;top:562px}
+.connectivity-value-slide.is-network .v2-target[data-target="openai"]{left:1020px;top:302px}
+.connectivity-value-slide.is-network .v2-target[data-target="claude"]{left:1140px;top:302px}
+.connectivity-value-slide.is-network .v2-target[data-target="gemini"]{left:1260px;top:302px}
+.connectivity-value-slide.is-network .v2-target[data-target="mcp-a"]{left:1020px;top:460px}
+.connectivity-value-slide.is-network .v2-target[data-target="mcp-b"]{left:1140px;top:460px}
+.connectivity-value-slide.is-network .v2-target[data-target="mcp-c"]{left:1260px;top:460px}
+.connectivity-value-slide.is-network .v2-api-target{left:1260px;top:570px;opacity:1}
 .connectivity-value-slide.is-network .v2-local-routes,.connectivity-value-slide.is-network .v2-fragment,.connectivity-value-slide.is-network .v2-pain{opacity:0}
 .connectivity-value-slide.v2-network-ready .v2-network-routes,.connectivity-value-slide.v2-network-ready .v2-lane,.connectivity-value-slide.v2-network-ready .v2-plane{opacity:1}
 .connectivity-value-slide.is-governed .v2-govern,.connectivity-value-slide.is-governed .v2-konnect{opacity:1;transform:translateY(0)}
