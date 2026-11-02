@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>AIエージェントとConnectivity | API + AI Summit Japan 2026</title><link rel="icon" href="./images/kong-mark.png"><link rel="stylesheet" href="./styles.css?v=20261102-p14c"></head>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>AIエージェントとConnectivity | API + AI Summit Japan 2026</title><link rel="icon" href="./images/kong-mark.png"><link rel="stylesheet" href="./styles.css?v=20261102-p14d"></head>
 <body>
 <main id="viewport" aria-label="登壇スライド"><div id="stage">
 <section class="slide cover" id="title" data-title="AIエージェントとConnectivity">
@@ -224,7 +224,7 @@
 <section class="slide standard motion-slide" id="context-architecture" data-title="Context Meshの配置と通信経路" data-component="architecture">
 <p class="eyebrow">CONTEXT MESH / HOW IT WORKS</p><h2>Context Meshは、定義・配置・実行で役割が分かれる。</h2>
 <div class="step-list"><span>1 全体像</span><span>2 Sourceを束ねる</span><span>3 Podを配置</span><span>4 Podの中身</span><span>5 MCP要求</span><span>6 APIと返却</span></div>
-<svg class="diagram architecture-diagram" viewBox="0 0 1448 465" role="img" aria-label="Context Meshの定義・配置・実行を段階的に表示。KonnectのSourceとMCP Server設定、Kong Operatorが管理する別々のGateway Data Plane PodとMCP Server Pod、InitとRunner、Gateway経由のMCP要求とAPI呼出しを順に説明する">
+<svg class="diagram architecture-diagram" viewBox="0 0 1448 465" role="img" aria-label="Context Meshの定義・配置・実行を段階的に表示。KonnectのSourceとMCP Server設定、Kong Operatorが管理する別々のGateway Data Plane PodとMCP Server Pod、Init containerとMCP Serverコンテナ、Gateway経由のMCP要求とAPI呼出しを順に説明する">
 <defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z"/></marker></defs>
 <g class="arch-view" data-view="overview">
   <path class="arch-route arch-route-strong" d="M434 230H522M920 230H1008"/>
@@ -255,7 +255,7 @@
   <path class="arch-route arch-route-strong" d="M460 235H545M830 235H905"/>
   <g class="arch-card"><rect x="155" y="144" width="305" height="183" rx="7"/><text class="arch-index" x="181" y="179">STARTUP</text><text class="arch-title" x="181" y="220">Init container</text><text class="arch-copy" x="181" y="262">Konnect生成のapp.pyを取得</text><text class="arch-detail" x="181" y="296">Pod起動時に実行</text></g>
   <g class="arch-card"><rect x="545" y="144" width="285" height="183" rx="7"/><text class="arch-index" x="571" y="179">SHARED VOLUME</text><text class="arch-title" x="571" y="220">app.py</text><text class="arch-copy" x="571" y="262">生成されたMCP Server</text><text class="arch-detail" x="571" y="296">同じPod内で受け渡し</text></g>
-  <g class="arch-card arch-card-accent"><rect x="905" y="123" width="385" height="224" rx="7"/><text class="arch-index" x="931" y="158">RUNNING</text><text class="arch-title" x="931" y="199">Runner / FastMCP</text><text class="arch-copy" x="931" y="237">Code Mode MCPを常駐実行</text><rect class="arch-inner" x="931" y="258" width="330" height="61" rx="5"/><text class="arch-inner-label" x="949" y="284">プロセス内Sandbox</text><text class="arch-detail" x="949" y="307">要求ごとの処理コードを実行</text></g>
+  <g class="arch-card arch-card-accent"><rect x="905" y="123" width="385" height="224" rx="7"/><text class="arch-index" x="931" y="158">RUNNING</text><text class="arch-title" x="931" y="199">MCP Serverコンテナ</text><text class="arch-copy" x="931" y="237">Code Mode MCPを常駐実行</text><rect class="arch-inner" x="931" y="258" width="330" height="61" rx="5"/><text class="arch-inner-label" x="949" y="284">プロセス内Sandbox</text><text class="arch-detail" x="949" y="307">要求ごとの処理コードを実行</text></g>
   <text class="arch-note" x="343" y="384">Podは常駐。データ処理コードの実行は、リクエストごと。</text>
 </g>
 <g class="arch-view" data-view="flow">
@@ -269,7 +269,7 @@
   <g class="arch-final"><rect x="37" y="325" width="250" height="58" rx="5"/><text x="56" y="362">加工した結果のみ</text></g>
 </g>
 </svg><p class="scene-caption"></p>
-<p class="source"><a href="https://developer.konghq.com/context-mesh/get-started/" target="_blank" rel="noopener">Context Mesh導入ガイド</a> · <a href="https://developer.konghq.com/operator/reference/architecture/" target="_blank" rel="noopener">Kong Operator構成</a> · <a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/CODE_MODE.md" target="_blank" rel="noopener">Code Mode実装分析</a></p>
+<p class="source"><a href="https://developer.konghq.com/context-mesh/get-started/" target="_blank" rel="noopener">Context Mesh導入ガイド</a> · <a href="https://developer.konghq.com/operator/reference/architecture/" target="_blank" rel="noopener">Kong Operator構成</a></p>
 </section>
 <section class="slide standard" id="context-takeaway" data-title="コンテキストを設計する">
 <p class="eyebrow">CONTEXT / TAKEAWAY</p><h2>コンテキストは、量より設計。</h2><p class="big-statement closing-emphasis">何にアクセスできるか？<br>どこで処理するか？<br><span class="accent">何をエージェントへ返すか？</span></p>
@@ -288,4 +288,4 @@
 <dialog id="menu"><button class="close" data-close>閉じる</button><h2>スライド一覧</h2><div id="slide-menu"></div></dialog>
 <dialog id="help"><button class="close" data-close>閉じる</button><h2>操作方法</h2><p><kbd>↓</kbd> <kbd>Space</kbd> <kbd>PageDown</kbd> 次の状態／ページ<br><kbd>↑</kbd> <kbd>PageUp</kbd> 前の状態／ページ<br><kbd>R</kbd> 現在の動きを再演<br><kbd>M</kbd> 一覧　<kbd>F</kbd> 全画面　<kbd>B</kbd> デモ／中断</p><p>ページ内アニメーションは各段階で停止します。最終状態から次へ進むと次ページへ移ります。前へ・一覧への移動は再生中でも動作を中止できます。</p><p>デモ中断や別画面への切替では現在の段階を保持します。戻った後に「再演」も可能です。ホイールは1操作ごと、タッチは上下スワイプで移動します。</p></dialog>
 <div id="pause-screen" hidden><h2>デモ／中断</h2><p>現在のページと停止状態を保持しています。</p><button id="resume">スライドに戻る</button></div><div id="live" aria-live="polite"></div>
-<script type="module" src="./deck.js?v=20261102-p14c"></script></body></html>
+<script type="module" src="./deck.js?v=20261102-p14e"></script></body></html>

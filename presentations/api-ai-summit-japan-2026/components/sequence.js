@@ -66,7 +66,7 @@ export function mountSequence(slide, specification, onChange = () => {}) {
 export const sequences = {
   architecture: {
     states:['定義・配置・実行の全体像','Sourceを束ねる','Podを配置する','Podの中身を見る','AgentのMCP要求','API呼出しと結果返却'],
-    captions:['管理はKonnect、配置はOperator、実行はGatewayとCode Mode MCPが担う。','OpenAPIと既存MCPをSourceとして束ね、MCP ServerをControl Planeに紐付ける。','Operatorが別Podを配置。Konnectの設定はWSSでData Planeへ直接届く。','Initが生成済みサーバーコードを取得。常駐Runnerが要求ごとの処理コードをSandboxで実行する。','AgentのMCP要求はGateway Data Planeを経由してCode Mode MCPへ届く。','Code Mode MCPがGateway経由でAPIを呼び、加工した結果だけを同じ経路で返す。'],
+    captions:['管理はKonnect、配置はOperator、実行はGatewayとCode Mode MCPが担う。','OpenAPIと既存MCPをSourceとして束ね、MCP ServerをControl Planeに紐付ける。','Operatorが別Podを配置。Konnectの設定はWSSでData Planeへ直接届く。','Init containerがサーバーコードを取得。常駐するMCP Serverコンテナが要求ごとの処理コードをSandboxで実行する。','AgentのMCP要求はGateway Data Planeを経由してCode Mode MCPへ届く。','Code Mode MCPがGateway経由でAPIを呼び、加工した結果だけを同じ経路で返す。'],
     packetDuration:500,
     paths:{
       1:[[[368,175],[490,175]],[[368,295],[490,295]],[[1058,235],[1150,235]]],
