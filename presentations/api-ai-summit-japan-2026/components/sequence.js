@@ -20,7 +20,7 @@ export function mountSequence(slide, specification, onChange = () => {}) {
       const tick = now => {
         if (token !== generation) { settle = null; resolve(); return; }
         start ??= now;
-        const progress = Math.min(1,(now-start)/850);
+        const progress = Math.min(1,(now-start)/(specification.packetDuration || 850));
         const position = progress*(path.length-1);
         const index = Math.min(path.length-2,Math.floor(position));
         const fraction = position-index;
@@ -65,14 +65,15 @@ export function mountSequence(slide, specification, onChange = () => {}) {
 
 export const sequences = {
   architecture: {
-    states:['Konnectが構成を管理','Operatorが2種類のPodを管理','AgentのMCP要求','MCP ServerからAPIを呼ぶ','加工した結果を返す'],
-    captions:['Konnectが構成を管理し、Data Planeへ設定を直接同期する。','Kong OperatorがGatewayとMCP Serverを別々のPodとして管理する。','AgentのMCP要求はData PlaneからCode Mode MCPへ届く。','Code ModeのAPI呼出しもData Planeを経由する。','加工済みの結果だけが、同じ経路でAgentへ戻る。'],
-    highlights:[['control'],['operator','gateway','server'],['agent','gateway','server'],['server','gateway','apis'],['server','gateway','agent']],
+    states:['定義・配置・実行の全体像','Sourceを束ねる','Podを配置する','Podの中身を見る','AgentのMCP要求','API呼出しと結果返却'],
+    captions:['管理はKonnect、配置はOperator、実行はGatewayとCode Mode MCPが担う。','OpenAPIと既存MCPをSourceとして束ね、MCP ServerをControl Planeに紐付ける。','Operatorが別Podを配置。Konnectの設定はWSSでData Planeへ直接届く。','Initが生成済みサーバーコードを取得。常駐Runnerが要求ごとの処理コードをSandboxで実行する。','AgentのMCP要求はGateway Data Planeを経由してCode Mode MCPへ届く。','Code Mode MCPがGateway経由でAPIを呼び、加工した結果だけを同じ経路で返す。'],
+    packetDuration:500,
     paths:{
-      1:[[[505,93],[505,174]],[[482,247],[482,306]],[[615,210],[773,210],[773,284],[810,284]],[[740,93],[740,282],[625,282],[625,306]]],
-      2:[[[225,364],[370,364],[505,364],[640,346],[810,346]]],
-      3:[[[810,346],[640,346],[640,390],[640,430],[1185,430],[1185,364],[1210,364]],[[1210,364],[1185,364],[1185,430],[640,430],[640,390],[640,346],[810,346]]],
-      4:[[[810,346],[640,346],[505,364],[370,364],[225,364]]]
+      1:[[[368,175],[490,175]],[[368,295],[490,295]],[[1058,235],[1150,235]]],
+      2:[[[370,229],[370,58],[555,58]],[[724,108],[724,218]],[[378,286],[621,286],[621,249],[658,249]],[[378,315],[620,315],[620,365],[658,365]]],
+      3:[[[460,235],[545,235]],[[830,235],[905,235]]],
+      4:[[[272,235],[386,235]],[[666,235],[746,235]]],
+      5:[[[746,318],[666,318]],[[526,344],[526,388],[1280,388],[1280,310]],[[1280,310],[1280,388],[526,388],[526,344]],[[666,235],[746,235]],[[746,235],[666,235]],[[386,235],[272,235]]]
     }
   }
 };

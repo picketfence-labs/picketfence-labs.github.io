@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>AIエージェントとConnectivity | API + AI Summit Japan 2026</title><link rel="icon" href="./images/kong-mark.png"><link rel="stylesheet" href="./styles.css?v=20261102-p4c"></head>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="dark"><title>AIエージェントとConnectivity | API + AI Summit Japan 2026</title><link rel="icon" href="./images/kong-mark.png"><link rel="stylesheet" href="./styles.css?v=20261102-p14c"></head>
 <body>
 <main id="viewport" aria-label="登壇スライド"><div id="stage">
 <section class="slide cover" id="title" data-title="AIエージェントとConnectivity">
@@ -222,21 +222,52 @@
 <p class="source"><a href="https://developer.konghq.com/context-mesh/" target="_blank" rel="noopener">Kong Context Mesh Docs</a> · <a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/TEST_INSURANCE.md" target="_blank" rel="noopener">保険デモ I-1</a> · 取得件数は提供例</p>
 </section>
 <section class="slide standard motion-slide" id="context-architecture" data-title="Context Meshの配置と通信経路" data-component="architecture">
-<p class="eyebrow">CONTEXT MESH / HOW IT WORKS</p><h2>GatewayとMCP Serverは、別のPodで動く。</h2>
-<div class="step-list"><span>1 Konnect CP</span><span>2 Kong Operator</span><span>3 Agent → DP</span><span>4 MCP → API</span><span>5 結果を返す</span></div>
-<svg class="diagram architecture-diagram" viewBox="0 0 1448 465" role="img" aria-label="Konnect Control PlaneからOperatorへ構成を渡し、Data Plane Podへ設定を同期。Kubernetes Clusterの別Podで動くData PlaneとCode Mode MCPが、Agentおよび業務APIの通信を中継する">
-<g data-part="control"><rect class="arch-node arch-control" x="430" y="5" width="580" height="88" rx="7"/><text class="arch-heading" x="455" y="41">Konnect / Control Plane</text><text class="arch-muted" x="455" y="71">Source・MCP Server・Gateway設定</text></g>
-<rect class="arch-cluster" x="260" y="130" width="900" height="325" rx="8"/><text class="arch-cluster-label" x="280" y="159">KUBERNETES CLUSTER</text>
-<path class="arch-management" d="M505 93V174M482 247V306M615 210H773V284H810"/><path class="arch-config" d="M740 93V282H625V306"/>
-<text class="arch-route-label" x="514" y="118">Konnect API</text><text class="arch-route-label" x="754" y="117">設定同期 / WSS</text>
-<g data-part="operator"><rect class="arch-node" x="350" y="174" width="265" height="73" rx="6"/><text class="arch-heading" x="371" y="206">Kong Operator</text><text class="arch-muted" x="371" y="231">Podを配置・管理</text></g>
-<text class="arch-route-label" x="665" y="201">Podの管理</text>
-<g data-part="agent"><rect class="arch-node" x="20" y="314" width="205" height="100" rx="6"/><text class="arch-heading" x="43" y="353">AI Agent</text><text class="arch-muted" x="43" y="382">MCP Client</text></g>
-<path class="arch-traffic" d="M225 364H370M640 346H810M640 390V430H1185V364H1210"/>
-<g data-part="gateway"><rect class="arch-node" x="370" y="306" width="270" height="108" rx="6"/><text class="arch-heading" x="393" y="342">Data Plane Pod</text><text class="arch-muted" x="393" y="370">Kong Gateway</text><text class="arch-mini" x="393" y="397">MCP・API通信を中継</text></g>
-<g data-part="server"><rect class="arch-pod" x="810" y="215" width="320" height="172" rx="6"/><text class="arch-heading" x="831" y="246">MCP Server Pod</text><rect class="arch-sandbox" x="831" y="262" width="278" height="39" rx="3"/><text class="arch-mini" x="842" y="279">Init container</text><text class="arch-mini" x="960" y="290">生成コードを取得</text><rect class="arch-sandbox" x="831" y="307" width="278" height="64" rx="3"/><text class="arch-mini" x="842" y="327">Runner container / Code Mode MCP</text><text class="arch-mini" x="842" y="355">プロセス内Sandboxでコード実行</text></g>
-<g data-part="apis"><rect class="arch-node" x="1210" y="314" width="210" height="100" rx="6"/><text class="arch-heading" x="1233" y="353">業務 API</text><text class="arch-muted" x="1233" y="382">業務データ</text></g>
-<text class="arch-route-label" x="249" y="353">MCP要求</text><text class="arch-route-label" x="674" y="335">MCP</text><text class="arch-route-label" x="905" y="417">API呼出しもData Plane経由</text>
+<p class="eyebrow">CONTEXT MESH / HOW IT WORKS</p><h2>Context Meshは、定義・配置・実行で役割が分かれる。</h2>
+<div class="step-list"><span>1 全体像</span><span>2 Sourceを束ねる</span><span>3 Podを配置</span><span>4 Podの中身</span><span>5 MCP要求</span><span>6 APIと返却</span></div>
+<svg class="diagram architecture-diagram" viewBox="0 0 1448 465" role="img" aria-label="Context Meshの定義・配置・実行を段階的に表示。KonnectのSourceとMCP Server設定、Kong Operatorが管理する別々のGateway Data Plane PodとMCP Server Pod、InitとRunner、Gateway経由のMCP要求とAPI呼出しを順に説明する">
+<defs><marker id="arch-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8Z"/></marker></defs>
+<g class="arch-view" data-view="overview">
+  <path class="arch-route arch-route-strong" d="M434 230H522M920 230H1008"/>
+  <g class="arch-card"><rect x="70" y="105" width="364" height="255" rx="8"/><text class="arch-index" x="100" y="147">01 / DEFINE</text><text class="arch-title" x="100" y="194">Konnectで定義</text><text class="arch-copy" x="100" y="244">API・既存MCPをSourceに</text><text class="arch-copy" x="100" y="277">Code Mode MCPへ束ねる</text></g>
+  <g class="arch-card"><rect x="522" y="105" width="398" height="255" rx="8"/><text class="arch-index" x="552" y="147">02 / DEPLOY</text><text class="arch-title" x="552" y="194">Operatorが配置</text><text class="arch-copy" x="552" y="244">Gateway Data Plane Pod</text><text class="arch-copy" x="552" y="277">MCP Server Pod</text></g>
+  <g class="arch-card"><rect x="1008" y="105" width="364" height="255" rx="8"/><text class="arch-index" x="1038" y="147">03 / RUN</text><text class="arch-title" x="1038" y="194">Gateway経由で実行</text><text class="arch-copy" x="1038" y="244">Agent → MCP → API</text><text class="arch-copy" x="1038" y="277">加工結果だけを返す</text></g>
+</g>
+<g class="arch-view" data-view="define">
+  <text class="arch-section-label" x="84" y="82">SOURCE</text><text class="arch-section-label" x="498" y="82">KONNECT / CONTROL PLANE</text><text class="arch-section-label" x="1158" y="82">MCP SERVER</text>
+  <path class="arch-route arch-route-strong" d="M368 175H490M368 295H490M1058 235H1150"/>
+  <g class="arch-card"><rect x="84" y="130" width="284" height="90" rx="7"/><text class="arch-title" x="110" y="166">REST API</text><text class="arch-copy" x="110" y="195">OpenAPI spec</text></g>
+  <g class="arch-card"><rect x="84" y="250" width="284" height="90" rx="7"/><text class="arch-title" x="110" y="286">既存MCP Server</text><text class="arch-copy" x="110" y="315">upstream URL</text></g>
+  <g class="arch-card arch-card-accent"><rect x="490" y="115" width="568" height="250" rx="8"/><text class="arch-title" x="520" y="157">SourceとMCP Serverを紐付ける</text><text class="arch-copy" x="520" y="205">1  Sourceを登録</text><text class="arch-copy" x="520" y="248">2  MCP ServerへSourceをmapping</text><text class="arch-copy" x="520" y="291">3  Gateway Control Planeへmapping</text><text class="arch-detail" x="520" y="337">basic mode → Kubernetesへ配置</text></g>
+  <g class="arch-card"><rect x="1150" y="165" width="220" height="140" rx="7"/><text class="arch-title" x="1175" y="210">Code Mode</text><text class="arch-title" x="1175" y="242">MCP Server</text><text class="arch-copy" x="1175" y="276">複数Sourceを集約</text></g>
+</g>
+<g class="arch-view" data-view="deploy">
+  <g class="arch-card"><rect x="555" y="8" width="338" height="100" rx="7"/><text class="arch-title" x="581" y="50">Konnect Control Plane</text><text class="arch-copy" x="581" y="82">Gateway設定の管理面</text></g>
+  <rect class="arch-cluster" x="86" y="153" width="1276" height="294" rx="8"/><text class="arch-section-label" x="111" y="184">KUBERNETES CLUSTER</text>
+  <path class="arch-route arch-route-management" d="M370 229V58H555M378 286H621V249H658M378 315H620V365H658"/><path class="arch-route arch-route-strong" d="M724 108V218"/>
+  <text class="arch-line-label" x="393" y="131">Konnect API / HTTPS</text><text class="arch-line-label" x="737" y="151">WSS 設定同期</text><text class="arch-line-label" x="475" y="240">Podを管理</text><text class="arch-line-label" x="476" y="390">Podを管理</text>
+  <g class="arch-card"><rect x="110" y="229" width="268" height="119" rx="7"/><text class="arch-title" x="135" y="271">Kong Operator</text><text class="arch-copy" x="135" y="305">CRDをreconcile</text><text class="arch-detail" x="135" y="330">mcp-server feature gate</text></g>
+  <g class="arch-card arch-card-accent"><rect x="658" y="218" width="308" height="84" rx="7"/><text class="arch-title" x="682" y="253">Gateway DP Pod</text><text class="arch-copy" x="682" y="281">Kong Gateway / hybrid mode</text></g>
+  <g class="arch-card arch-card-accent"><rect x="658" y="329" width="308" height="84" rx="7"/><text class="arch-title" x="682" y="364">MCP Server Pod</text><text class="arch-copy" x="682" y="392">Code Mode MCP runtime</text></g>
+  <g class="arch-card arch-card-subtle"><rect x="1004" y="226" width="300" height="178" rx="7"/><text class="arch-index" x="1030" y="262">KUBERNETES RESOURCES</text><text class="arch-copy" x="1030" y="308">DataPlane</text><text class="arch-copy" x="1030" y="350">MCPServer</text></g>
+</g>
+<g class="arch-view" data-view="inside">
+  <rect class="arch-cluster" x="88" y="42" width="1272" height="380" rx="8"/><text class="arch-section-label" x="112" y="79">MCP SERVER POD / ZOOM IN</text>
+  <path class="arch-route arch-route-strong" d="M460 235H545M830 235H905"/>
+  <g class="arch-card"><rect x="155" y="144" width="305" height="183" rx="7"/><text class="arch-index" x="181" y="179">STARTUP</text><text class="arch-title" x="181" y="220">Init container</text><text class="arch-copy" x="181" y="262">Konnect生成のapp.pyを取得</text><text class="arch-detail" x="181" y="296">Pod起動時に実行</text></g>
+  <g class="arch-card"><rect x="545" y="144" width="285" height="183" rx="7"/><text class="arch-index" x="571" y="179">SHARED VOLUME</text><text class="arch-title" x="571" y="220">app.py</text><text class="arch-copy" x="571" y="262">生成されたMCP Server</text><text class="arch-detail" x="571" y="296">同じPod内で受け渡し</text></g>
+  <g class="arch-card arch-card-accent"><rect x="905" y="123" width="385" height="224" rx="7"/><text class="arch-index" x="931" y="158">RUNNING</text><text class="arch-title" x="931" y="199">Runner / FastMCP</text><text class="arch-copy" x="931" y="237">Code Mode MCPを常駐実行</text><rect class="arch-inner" x="931" y="258" width="330" height="61" rx="5"/><text class="arch-inner-label" x="949" y="284">プロセス内Sandbox</text><text class="arch-detail" x="949" y="307">要求ごとの処理コードを実行</text></g>
+  <text class="arch-note" x="343" y="384">Podは常駐。データ処理コードの実行は、リクエストごと。</text>
+</g>
+<g class="arch-view" data-view="flow">
+  <rect class="arch-cluster" x="320" y="68" width="760" height="344" rx="8"/><text class="arch-section-label" x="344" y="105">KUBERNETES CLUSTER</text>
+  <path class="arch-route arch-route-request" d="M272 235H386M666 235H746"/><path class="arch-route arch-route-api" d="M746 318H666M526 344V388H1280V310"/>
+  <text class="arch-line-label" x="279" y="218">MCP要求</text><text class="arch-line-label" x="673" y="218">/mcp/&lt;name&gt;</text><text class="arch-line-label arch-api-label" x="777" y="375">API呼出しもGateway経由</text>
+  <g class="arch-card arch-flow-agent"><rect x="40" y="185" width="232" height="100" rx="7"/><text class="arch-title" x="66" y="225">AI Agent</text><text class="arch-copy" x="66" y="258">MCP Client</text></g>
+  <g class="arch-card arch-card-accent"><rect x="386" y="154" width="280" height="190" rx="7"/><text class="arch-index" x="412" y="190">DATA PLANE POD</text><text class="arch-title" x="412" y="236">Kong Gateway</text><text class="arch-copy" x="412" y="277">MCP・APIをproxy</text><text class="arch-detail" x="412" y="312">Service / plugins</text></g>
+  <g class="arch-card arch-card-accent"><rect x="746" y="154" width="282" height="190" rx="7"/><text class="arch-index" x="772" y="190">MCP SERVER POD</text><text class="arch-title" x="772" y="236">Code Mode MCP</text><text class="arch-copy arch-flow-request" x="772" y="277">execute(code)</text><text class="arch-copy arch-flow-result" x="772" y="277">集計・加工を実行</text><text class="arch-detail arch-flow-result" x="772" y="312">結果のみAgentへ返却</text></g>
+  <g class="arch-card arch-flow-api"><rect x="1168" y="185" width="238" height="125" rx="7"/><text class="arch-title" x="1194" y="230">業務API</text><text class="arch-copy" x="1194" y="265">申込・契約・商品</text><text class="arch-detail" x="1194" y="290">複数APIでも同じ経路</text></g>
+  <g class="arch-final"><rect x="37" y="325" width="250" height="58" rx="5"/><text x="56" y="362">加工した結果のみ</text></g>
+</g>
 </svg><p class="scene-caption"></p>
 <p class="source"><a href="https://developer.konghq.com/context-mesh/get-started/" target="_blank" rel="noopener">Context Mesh導入ガイド</a> · <a href="https://developer.konghq.com/operator/reference/architecture/" target="_blank" rel="noopener">Kong Operator構成</a> · <a href="https://github.com/picketfence-labs/konnect-code-mode-mcp/blob/main/CODE_MODE.md" target="_blank" rel="noopener">Code Mode実装分析</a></p>
 </section>
@@ -257,4 +288,4 @@
 <dialog id="menu"><button class="close" data-close>閉じる</button><h2>スライド一覧</h2><div id="slide-menu"></div></dialog>
 <dialog id="help"><button class="close" data-close>閉じる</button><h2>操作方法</h2><p><kbd>↓</kbd> <kbd>Space</kbd> <kbd>PageDown</kbd> 次の状態／ページ<br><kbd>↑</kbd> <kbd>PageUp</kbd> 前の状態／ページ<br><kbd>R</kbd> 現在の動きを再演<br><kbd>M</kbd> 一覧　<kbd>F</kbd> 全画面　<kbd>B</kbd> デモ／中断</p><p>ページ内アニメーションは各段階で停止します。最終状態から次へ進むと次ページへ移ります。前へ・一覧への移動は再生中でも動作を中止できます。</p><p>デモ中断や別画面への切替では現在の段階を保持します。戻った後に「再演」も可能です。ホイールは1操作ごと、タッチは上下スワイプで移動します。</p></dialog>
 <div id="pause-screen" hidden><h2>デモ／中断</h2><p>現在のページと停止状態を保持しています。</p><button id="resume">スライドに戻る</button></div><div id="live" aria-live="polite"></div>
-<script type="module" src="./deck.js?v=20261102-p4b"></script></body></html>
+<script type="module" src="./deck.js?v=20261102-p14c"></script></body></html>

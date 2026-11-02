@@ -73,7 +73,33 @@
 .architecture-diagram .arch-route-label{font-size:14px;fill:#9eac9e}
 .architecture-diagram [data-part].highlight .arch-node,.architecture-diagram [data-part].highlight .arch-pod{stroke:#ccff00;stroke-width:3}
 .architecture-diagram [data-part].highlight .arch-heading{fill:#ccff00}
-@media(prefers-reduced-motion:reduce){.code-diagram .code-tool-chips rect,.code-diagram .code-tool-chips text{transition:none}}
+/* P14: one technical layer per stop, then zoom into the runtime and request path. */
+#context-architecture .arch-view{display:none;pointer-events:none}
+#context-architecture[data-step="0"] .arch-view[data-view="overview"],#context-architecture[data-step="1"] .arch-view[data-view="define"],#context-architecture[data-step="2"] .arch-view[data-view="deploy"],#context-architecture[data-step="3"] .arch-view[data-view="inside"],#context-architecture[data-step="4"] .arch-view[data-view="flow"],#context-architecture[data-step="5"] .arch-view[data-view="flow"]{display:block;pointer-events:auto;animation:arch-enter .42s ease-out both}
+@keyframes arch-enter{from{opacity:.2;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+.architecture-diagram #arch-arrow path{fill:#ccff00}
+.architecture-diagram .arch-card>rect{fill:#111713;stroke:#687768;stroke-width:2}
+.architecture-diagram .arch-card-accent>rect{fill:#132419;stroke:#ccff00;stroke-width:2.5}
+.architecture-diagram .arch-card-subtle>rect{fill:#0d160f;stroke:#4d5c4c;stroke-width:1.5}
+.architecture-diagram .arch-index{font-size:17px;font-weight:800;letter-spacing:1.6px;fill:#ccff00}
+.architecture-diagram .arch-title{font-size:27px;font-weight:750;fill:#fff}
+.architecture-diagram .arch-copy{font-size:20px;font-weight:550;fill:#d1dbcf}
+.architecture-diagram .arch-detail{font-size:17px;font-weight:550;fill:#a8baa6}
+.architecture-diagram .arch-section-label{font-size:18px;font-weight:800;letter-spacing:1.6px;fill:#ccff00}
+.architecture-diagram .arch-line-label{font-size:18px;font-weight:700;fill:#bcd0b8}
+.architecture-diagram .arch-route{fill:none;stroke:#8ca08b;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;marker-end:url(#arch-arrow)}
+.architecture-diagram .arch-route-strong{stroke:#ccff00;stroke-width:3.5}
+.architecture-diagram .arch-route-management{stroke:#a4b5a0;stroke-dasharray:7 7}
+.architecture-diagram .arch-inner{fill:#0b1a0d;stroke:#ccff00;stroke-width:1.5}
+.architecture-diagram .arch-inner-label{font-size:20px;font-weight:700;fill:#ccff00}
+.architecture-diagram .arch-note{font-size:24px;font-weight:700;fill:#ccff00}
+#context-architecture[data-step="4"] .arch-flow-api{opacity:.24}
+#context-architecture[data-step="4"] .arch-route-api,#context-architecture[data-step="4"] .arch-api-label,#context-architecture[data-step="4"] .arch-flow-result,#context-architecture[data-step="4"] .arch-final{opacity:0}
+#context-architecture[data-step="5"] .arch-flow-request{opacity:0}
+#context-architecture[data-step="5"] .arch-route-request{opacity:.3}
+.architecture-diagram .arch-final{opacity:0;transition:opacity .3s}.architecture-diagram .arch-final rect{fill:#12250e;stroke:#ccff00;stroke-width:2}.architecture-diagram .arch-final text{font-size:19px;font-weight:800;fill:#ccff00}
+#context-architecture[data-step="5"] .arch-final{opacity:1}
+@media(prefers-reduced-motion:reduce){.code-diagram .code-tool-chips rect,.code-diagram .code-tool-chips text,.architecture-diagram .arch-final{transition:none}#context-architecture .arch-view{animation:none!important}}
 
 .code-diagram .code-snippet{opacity:0}.code-diagram .code-snippet rect{fill:#091d0c;stroke:#ccff00}.code-diagram .code-snippet text{font-family:'Roboto Mono',monospace;font-size:13px;fill:#ccff00}
 
