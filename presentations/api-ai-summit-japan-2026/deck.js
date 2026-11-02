@@ -1,6 +1,7 @@
 import {mountP1} from './components/p1.js';
 import {mountSequence, sequences} from './components/sequence.js';
 import {mountConnectivity} from './components/connectivity.js';
+import {mountConnectivityValue} from './components/connectivity-value.js';
 import {mountGateway} from './components/gateway.js';
 import {mountContextCode} from './components/context-code.js';
 
@@ -27,6 +28,7 @@ for (const [i, slide] of slides.entries()) {
   }
   if (slide.dataset.component === 'p1') components.set(i,mountP1($('#p1-host'),()=>queueMicrotask(update)));
   else if (slide.dataset.component === 'connectivity') components.set(i,mountConnectivity(slide,()=>queueMicrotask(update)));
+  else if (slide.dataset.component === 'connectivityValue') components.set(i,mountConnectivityValue(slide,()=>queueMicrotask(update)));
   else if (slide.dataset.component === 'gateway') components.set(i,mountGateway(slide,()=>queueMicrotask(update)));
   else if (slide.dataset.component === 'code') components.set(i,mountContextCode(slide,()=>queueMicrotask(update)));
   else if (sequences[slide.dataset.component]) {

@@ -64,15 +64,6 @@ export function mountSequence(slide, specification, onChange = () => {}) {
 }
 
 export const sequences = {
-  connectivityValue: {
-    states:['点ごとの対応','全経路を面で捉える','Kong + Konnect'],
-    captions:['接続ごとの個別対応は、増えるほど部分最適になる。','KongはAgent・LLM・MCP・APIをまたぐConnectivityを支える。','KongのConnectivity基盤を、Konnectで企業全体の運用へつなぐ。'],
-    highlights:[['points'],['plane'],['plane','konnect']],
-    paths:{
-      1:[[[765,179],[1180,179]],[[765,256],[1180,256]],[[765,333],[970,333],[1100,333],[1210,333]]],
-      2:[[[990,68],[990,90],[990,125]]]
-    }
-  },
   architecture: {
     states:['Konnectが構成を管理','Operatorが2種類のPodを管理','AgentのMCP要求','MCP ServerからAPIを呼ぶ','加工した結果を返す'],
     captions:['Konnectが構成を管理し、Data Planeへ設定を直接同期する。','Kong OperatorがGatewayとMCP Serverを別々のPodとして管理する。','AgentのMCP要求はData PlaneからCode Mode MCPへ届く。','Code ModeのAPI呼出しもData Planeを経由する。','加工済みの結果だけが、同じ経路でAgentへ戻る。'],
