@@ -50,7 +50,7 @@
     <div class="card"><div class="card-head"><h3>前回週末からのin / out</h3><p id="stage4-change-period"></p></div><div id="stage4-movements" class="movement-grid"></div><p class="footnote">2時点のOpen Stage 4集合の差です。outの移行先を表示し、期間内の一時的な出入りは別途履歴確認が必要です。</p></div>
     <div class="card"><div class="card-head"><h3>課題と重要な更新</h3><p>SE Notes・確認済みSlackの要約</p></div><div id="stage4-highlights" class="tracking-highlights"></div><p id="tracking-slack-coverage" class="footnote"></p></div>
     <details class="card compact" id="stage4-all-list"><summary id="stage4-all-summary">全Opportunity一覧を開く</summary>
-    <div class="controls"><label>Stage 4の案件を探す<input id="stage4-search" type="search" placeholder="案件名・AE・SE・SE Notes" autocomplete="off"></label><label>SE Notes<select id="stage4-notes"><option value="all">すべて</option><option value="missing">未登録のみ</option></select></label></div>
+    <div class="controls"><label>Stage 4の案件を探す<input id="stage4-search" type="search" placeholder="案件名・AE・SE・SE Notes" autocomplete="off"></label><label>Primary<select id="stage4-primary"><option value="all">すべて</option><option value="missing">Primary未登録</option></select></label><label>SE Notes<select id="stage4-notes"><option value="all">すべて</option><option value="missing">未登録のみ</option></select></label></div>
     <div class="card-head"><h3>評価中の案件</h3><p id="stage4-count" aria-live="polite"></p></div><div id="stage4-table" class="table-scroll compact-pipeline"></div><p class="footnote">SE NotesはCRM登録内容の抜粋です。登録更新日時を活動実施日としては扱いません。</p>
     </details>
   </section>
@@ -182,8 +182,8 @@ if(d.tracking.available){for(const state of [...new Set(d.tracking.pocs.map(p=>p
 ['poc-search','poc-status'].forEach(id=>$(id).addEventListener(id==='poc-search'?'input':'change',renderPocs));
 renderPocs();renderStage4Overview();
 function renderStage4(){
- const q=$('stage4-search').value.trim().toLowerCase(),missing=$('stage4-notes').value==='missing';
- const rows=d.stage4.filter(r=>(!missing||!r.notes)&&(!q||[r.name,r.owner,r.primary,r.notes].join(' ').toLowerCase().includes(q)));
+ const q=$('stage4-search').value.trim().toLowerCase(),missing=$('stage4-notes').value==='missing',primaryMissing=$('stage4-primary').value==='missing';
+ const rows=d.stage4.filter(r=>(!primaryMissing||!r.primary)&&(!missing||!r.notes)&&(!q||[r.name,r.owner,r.primary,r.notes].join(' ').toLowerCase().includes(q)));
  $('stage4-count').textContent=`表示 ${rows.length} / Open ${d.stage4.length}件 · SE Notes未登録 ${d.stage4.filter(r=>!r.notes).length}件`;
  $('stage4-table').innerHTML=rows.length?table(['案件','AE / Primary','Close予定','SE Notes'],rows.map(r=>[
   crm(r.id,r.name),`${esc(r.owner)}<br><strong>${esc(r.primary||'Primary未登録')}</strong>${!r.primary?candidateHtml(r.id):''}`,esc(r.close||'未登録'),
@@ -217,7 +217,7 @@ function renderActivity(){
  }).join(''):'<p class="empty">条件に合う案件はありません。</p>';
  $('activity-coverage').textContent=`Primaryは${a.primary_observed_at?a.primary_observed_at.slice(0,10)+'取得の登録値（前週末の担当履歴ではありません）':'未取得。未取得を未登録として扱いません'}。SE Notesは${a.end}時点の登録内容です。週内更新は日次差分または追跡項目履歴で検出。SFDC活動はAE / SDR等の登録も含み、入力所有者を表示します。項目履歴は追跡設定された範囲、日次差分は観測間の変化です。CalendarはSE別の保存済み採用予定${a.totals.calendar_included_occurrences}件中、直接Opportunity参照を持つ${a.totals.calendar_linked_occurrences}件を候補として併記。IDのない予定やSlackの全活動の網羅確認は含みません。`;
 }
-['stage4-search','stage4-notes'].forEach(id=>$(id).addEventListener(id==='stage4-search'?'input':'change',renderStage4));
+['stage4-search','stage4-notes','stage4-primary'].forEach(id=>$(id).addEventListener(id==='stage4-search'?'input':'change',renderStage4));
 ['activity-search','activity-filter'].forEach(id=>$(id).addEventListener(id==='activity-search'?'input':'change',renderActivity));
 renderStage4();renderActivity();
 $('ae-filters').innerHTML=d.owners.map((o,i)=>`<label><input type="checkbox" value="${esc(o.id)}" checked><span style="border-bottom:3px solid ${aeColors[i]}">${esc(o.name)}</span></label>`).join('');
