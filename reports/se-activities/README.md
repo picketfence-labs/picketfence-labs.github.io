@@ -1,4 +1,4 @@
-# SEアクティビティレポート
+# SE Activity Tracking
 
 [2026-11-09開始週のレポート](https://picketfence-labs.github.io/reports/se-activities/jp-se-weekly-20261109.html)
 
