@@ -314,7 +314,7 @@ function renderOperationalWork(){
   ]));
   $('operational-load-card').hidden=false;
   $('operational-load-table').innerHTML=table(['支援計画','週','名目枠','同scope会議の内数','追加の暫定枠'],o.plans.flatMap(p=>p.weeks.map(w=>[esc(p.label)+' / '+esc(p.person),shortDate(w.week),fmt(rationalHours(w.nominal_hours))+'h',fmt(rationalHours(w.credited_calendar_hours))+'h',fmt(rationalHours(w.additional_hours))+'h'])));
-  $('operational-load-limits').textContent='既存r4の初期2週8h/週、その後2h/週を、開始予定と想定担当に当てはめた条件付き計画です。実開始・支援体制の確認で見直します。同scope確認済みのPoC定例0.5hは枠の内訳として控除済み。他の定例は同scope未確認のため自動控除していません。QA・チェックリストの残量、発行作業の所要時間は未推計で、全需要・実績・稼働率は未確定です。';
+  $('operational-load-limits').textContent='既存r4の初期2週8h/週、その後2h/週を、開始予定と想定担当に当てはめた条件付き計画です。実開始・支援体制の確認で見直します。同scope確認済みの会議は、表に示す時間を支援枠の内訳として控除済み。他の定例は同scope未確認のため自動控除していません。QA・チェックリストの残量、発行作業の所要時間は未推計で、全需要・実績・稼働率は未確定です。';
  }
 }
 ['work-search','work-filter'].forEach(id=>$(id).addEventListener(id==='work-search'?'input':'change',renderOperationalWork));
