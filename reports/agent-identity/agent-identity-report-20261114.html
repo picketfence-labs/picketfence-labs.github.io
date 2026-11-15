@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<meta name="report-template" content="vault-report-light/v1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>AIエージェントのアイデンティティ：Auth0とKongの役割と組み合わせ方</title>
+<style>/* vault-report-light/v1: generic styles extracted from management-light-ja/v4 */
+:root{--page:#d7ded4;--surface:#f8faf6;--ink:#263b2d;--text:#3f473e;--muted:#647060;--line:#b5c0af;--lime:#ccff00;--pale:#eff6d3;--amber:#f1d89c;--red:#a14132;--white:#fff;--radius:10px;font-family:"Funnel Sans","Hiragino Sans","Yu Gothic",system-ui,sans-serif;color:var(--text);background:var(--page);font-size:15px}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:78px}body{margin:0}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}a{color:var(--ink);text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #709c00;outline-offset:3px}.skip{position:absolute;top:-70px;left:20px;background:var(--lime);padding:10px;z-index:9}.skip:focus{top:10px}.masthead{max-width:1440px;margin:28px auto 0;padding:25px 44px 28px;border:1px solid #a8b4a1;position:relative}.masthead:before,.masthead:after{content:"+";position:absolute;font-size:22px;line-height:20px;color:#60715d;top:-10px}.masthead:before{left:-7px}.masthead:after{right:-7px}.folio{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.09em;color:#53604e}.brand-label{font-weight:800;display:flex;align-items:center;gap:10px;color:var(--ink)}.brand-label i{display:inline-block;width:11px;height:11px;background:var(--lime);border:1px solid #83974c}.headline{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:28px 0 24px}.eyebrow{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;margin:0 0 9px}h1{font-size:clamp(30px,3.5vw,49px);line-height:1.2;letter-spacing:-.03em;margin:0;color:var(--ink);font-weight:800}.deck{font-size:15px;margin:17px 0 0;line-height:1.7}.sep{margin:0 14px;color:#8a9684}.print-button{padding:11px 17px;border:1px solid #82917b;background:transparent;color:var(--ink);border-radius:30px;cursor:pointer;white-space:nowrap}.print-button:hover{background:var(--lime)}.source-strip{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:12px;padding-top:16px;border-top:1px solid var(--line)}.source-strip strong{font-weight:700;color:var(--ink)}.navigation{position:sticky;top:0;z-index:5;background:#d7ded4f5;backdrop-filter:blur(10px);display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);margin-top:18px}.navigation a{text-decoration:none;font-size:13px;padding:9px 17px;border-radius:30px}.navigation a:hover{background:var(--lime)}main{max-width:1440px;margin:auto;padding:0 44px}section{padding:45px 0 10px}.section-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}.section-number{font-size:15px;color:var(--ink);font-weight:700;background:var(--lime);min-width:37px;height:37px;display:grid;place-items:center;border-radius:50%}.section-head .eyebrow{margin:0 0 4px}h2{font-size:28px;margin:0;line-height:1.3;color:var(--ink);letter-spacing:-.02em}.scope-chip{margin-left:auto;border:1px solid #a6b49e;border-radius:20px;padding:7px 11px;font-size:11px;color:var(--muted);text-align:center}.section-intro{max-width:970px;line-height:1.9;margin:0 0 23px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.metric{border-top:3px solid #819077;padding:20px 22px;background:#eff3eb;min-width:0}.metric:first-child{border-top-color:var(--lime)}.metric-label{font-size:13px;color:var(--muted)}.metric-value{font-size:42px;color:var(--ink);font-weight:750;letter-spacing:-.04em;line-height:1.4;margin:3px 0}.metric-value small{font-size:15px;font-weight:500;margin-left:5px;letter-spacing:0}.metric-sub{font-size:12px;line-height:1.7;color:var(--muted)}.focus-list{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:24px}.focus-item{padding:2px 0 2px 15px;border-left:4px solid var(--lime);font-size:13px;line-height:1.8}.focus-item strong{display:block;color:var(--ink);margin-bottom:3px;font-size:15px}.card{background:var(--surface);border:1px solid #bac6b2;border-radius:var(--radius);padding:23px 26px;margin-bottom:20px;min-width:0;overflow:hidden}.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px}.card-head h3{font-size:18px;margin:0;color:var(--ink)}.card-head p{font-size:12px;color:var(--muted);margin:0;text-align:right}.chart-scroll{overflow-x:auto;overflow-y:hidden}.chart-scroll svg{display:block;max-width:100%;height:auto;width:100%;min-width:700px}.chart-label{fill:var(--muted);font-size:12px;font-family:inherit}.chart-text{fill:var(--text);font-size:13px;font-family:inherit}.chart-title{fill:var(--ink);font-size:16px;font-weight:700;font-family:inherit}.chart-grid{stroke:#d6ded0;stroke-width:1}.chart-key,.legend{display:flex;gap:12px 24px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:12px 0}.chart-key span,.legend span{display:flex;align-items:center;gap:8px}.chart-key i,.legend i{width:12px;height:12px;display:inline-block;border-radius:2px}.footnote{font-size:12px;line-height:1.85;color:var(--muted);margin:16px 0 0}.controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;margin-bottom:20px}.controls>label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}.controls input[type=search],.controls select{border:1px solid #9cad91;background:#f8faf6;color:var(--text);border-radius:6px;padding:10px 12px;height:42px;min-width:155px}.controls input[type=search]{min-width:270px}.controls select{cursor:pointer}.controls fieldset{border:0;margin:0;padding:0}.controls legend{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}.check-row{display:flex;gap:9px;flex-wrap:wrap}.check-row label{font-size:12px;background:#f8faf6;padding:10px 11px;border:1px solid #a6b39d;border-radius:6px;display:flex;align-items:center;gap:7px;cursor:pointer}input[type=checkbox],input[type=radio]{accent-color:#496a30;width:15px;height:15px}.assignment-controls{justify-content:space-between;gap:20px}.segmented{display:flex;border:1px solid #a6b39d;border-radius:6px;background:#f8faf6}.segmented label{padding:10px 13px;display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer}.segmented label+label{border-left:1px solid #c5cebf}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.65}th{text-align:left;background:#e7ede1;color:var(--ink);font-weight:700;border-bottom:1px solid #a8b69e;padding:11px 13px;white-space:nowrap}td{border-bottom:1px solid #dbe3d4;padding:11px 13px;vertical-align:top}tbody tr:last-child td{border-bottom:0}.numeric{text-align:right;font-variant-numeric:tabular-nums}.matrix th:not(:first-child),.matrix td:not(:first-child){text-align:center}.matrix td{vertical-align:middle}.matrix td.count-cell{font-size:24px;font-weight:650;color:var(--ink);border:5px solid var(--surface);min-width:110px;height:65px;border-radius:7px}.matrix tfoot td{font-weight:700;font-size:15px;background:#e7ede1}.case-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-bottom:20px}.case-card{background:var(--surface);border:1px solid #bac6b2;border-radius:var(--radius);overflow:hidden;min-width:0}.case-card summary{list-style:none;cursor:pointer;padding:19px 21px;display:block}.case-card summary::-webkit-details-marker{display:none}.case-title-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.case-title{font-size:17px;line-height:1.5;font-weight:700;color:var(--ink)}.case-age{font-size:21px;font-weight:700;color:var(--ink);white-space:nowrap;line-height:1.3}.case-age small{font-size:11px;font-weight:500;margin-left:3px}.case-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}.badge{border-radius:4px;padding:3px 7px;font-size:11px;background:#e6ecdf;color:#52624b}.badge.warn{background:#f0dfaa;color:#6d5323}.badge.good{background:#e4f0b1;color:#3e5d20}.case-preview{font-size:12px;line-height:1.8;color:var(--muted);margin:12px 0 0}.expand-label{font-size:11px;color:#526846;display:block;margin-top:12px}.case-content{padding:0 21px 21px;border-top:1px solid #dde5d6}.case-content dl{margin:0}.case-content dt{font-size:11px;font-weight:700;color:var(--muted);margin:18px 0 5px}.case-content dd{margin:0;font-size:13px;line-height:1.85;overflow-wrap:anywhere}.case-content .crm-name{font-size:11px;color:var(--muted);margin-top:6px}.case-content .record-list{margin:0;padding-left:19px;font-size:12px;line-height:1.9}.compact summary{font-size:14px;font-weight:650;color:var(--ink);cursor:pointer;line-height:1.5}.compact[open] summary{margin-bottom:20px}.compact p{font-size:13px;line-height:1.8}.history-panel+.history-panel{border-top:1px solid #d6dfce;padding-top:23px;margin-top:20px}.history-panel h4{font-size:16px;margin:0 0 8px;color:var(--ink)}.history-panel svg{display:block;width:100%;min-width:660px;height:auto}.history-panel{overflow-x:auto}.explanation{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:25px 0}.explanation>div{border-left:4px solid var(--lime);padding:10px 20px 10px 18px}.label-pill{font-size:11px;font-weight:600;color:#52614b}.explanation h3{font-size:18px;color:var(--ink);margin:9px 0}.explanation p{font-size:13px;line-height:1.95;margin:0}.definition-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 35px;margin-top:18px}.definition-grid p{font-size:12px;line-height:1.9;color:var(--muted)}.definition-grid strong{font-size:13px;color:var(--ink)}.report-footer{max-width:1352px;margin:40px auto 28px;padding:20px 0 0;border-top:1px solid #9eae95;display:flex;justify-content:space-between;gap:15px;font-size:11px;color:var(--muted)}.report-footer a{font-size:12px}.empty{padding:26px;font-size:14px;color:var(--muted);text-align:center}#tooltip{position:fixed;z-index:20;pointer-events:none;max-width:330px;white-space:pre-line;background:#263b2df2;color:white;padding:10px 13px;border-radius:6px;font-size:12px;line-height:1.7;box-shadow:none}.noscript{padding:30px;background:#fff5ca;text-align:center}.pos-over{color:#99432d;font-weight:700}.data-note{font-size:11px;color:var(--muted);margin:5px 0 0}
+@media(max-width:1100px){.masthead{margin:18px 22px 0;padding:24px 28px}main{padding:0 28px}.metrics{gap:10px}.metric{padding:16px}.metric-value{font-size:35px}.focus-list{gap:15px}.report-footer{margin-left:28px;margin-right:28px}.navigation{justify-content:flex-start}.navigation a{padding:8px 11px}.case-grid{grid-template-columns:1fr}.scope-chip{max-width:170px}.card{padding:21px}.folio{font-size:11px}}
+@media(max-width:650px){:root{font-size:14px}.masthead{margin:14px 14px 0;padding:20px}.headline{display:block;margin:23px 0}.print-button{margin-top:18px;font-size:12px;padding:8px 13px}.folio{gap:15px;font-size:10px;letter-spacing:0}.deck{font-size:12px}.sep{margin:0 7px}.source-strip{gap:7px 16px;font-size:10px}main{padding:0 16px}.navigation{gap:2px;padding:8px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap}.navigation a{padding:8px 11px;font-size:11px}.metrics{grid-template-columns:1fr 1fr}.metric-value{font-size:34px}.metric-label{font-size:11px}.metric-sub{font-size:10px}.focus-list{grid-template-columns:1fr;gap:16px}.section-head{gap:10px}.section-number{min-width:31px;height:31px;font-size:12px}.section-head h2{font-size:23px}.section-head .eyebrow{font-size:10px}.scope-chip{display:none}.section-intro{font-size:12px}.card{padding:17px 15px}.card-head{display:block}.card-head p{text-align:left;margin-top:7px}.controls{gap:12px}.controls input[type=search]{min-width:230px}.controls select{min-width:135px}.controls>label{flex:1}.check-row label{font-size:11px;padding:8px}.explanation,.definition-grid{grid-template-columns:1fr}.report-footer{margin:30px 16px;flex-wrap:wrap;font-size:10px}.legend{font-size:11px;gap:8px 15px}.card-head h3{font-size:16px}section{padding-top:33px}}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{html{scroll-behavior:auto}body,:root{background:white;color:#222;font-size:10pt}.masthead{margin:0;padding:14px;border:1px solid #aaa}.navigation,.controls,.print-button,.skip,.expand-label,#tooltip{display:none!important}main{max-width:none;padding:0}section{padding:22px 0 4px;break-inside:auto}.card,.case-card{background:white;border:1px solid #bbb;break-inside:avoid;margin-bottom:12px;overflow:visible}.chart-scroll,.table-scroll,.history-panel{overflow:visible}.chart-scroll svg,.history-panel svg{min-width:0;width:100%}.case-grid{display:block}.case-card{margin-bottom:10px}.metrics{gap:8px}.metric{background:#f6f7f3}.metric-value{font-size:25pt}.report-footer{margin-top:20px}.source-strip,.footnote{font-size:8pt}.card-head h3{font-size:13pt}h1{font-size:26pt}h2{font-size:19pt}h3{font-size:13pt}table{font-size:8pt}th,td{padding:6px}.focus-list{gap:12px}.case-content{font-size:9pt}.case-content dd{font-size:9pt}.case-content dt{font-size:8pt}.case-card summary{padding:10px 15px}.case-preview{font-size:9pt}.scope-chip{font-size:8pt}.definition-grid{grid-template-columns:1fr 1fr}.explanation p{font-size:9pt}.report-footer{font-size:8pt}}
+
+
+/* Generic report additions */
+[hidden]{display:none!important}caption{text-align:left;color:var(--muted);padding:0 0 12px;font-size:12px}td{overflow-wrap:anywhere}.table-scroll table{min-width:640px}.controls p{font-size:12px;color:var(--muted)}
+@media(max-width:650px){.controls input[type=search]{min-width:0;width:100%}.source-strip{overflow-wrap:anywhere}.folio{flex-wrap:wrap}.headline h1{overflow-wrap:anywhere}}
+@media print{.table-scroll table{min-width:0;table-layout:fixed}thead{display:table-header-group}tr{break-inside:avoid}#no-results{display:none!important}.card{break-inside:auto}h2,h3,summary{break-after:avoid}.navigation{position:static}}
+</style>
+<style>@media (min-width:1101px) and (max-width:1460px){.masthead{margin-left:22px;margin-right:22px}}code{font-size:.92em;background:#e7ede1;padding:1px 4px;border-radius:3px;overflow-wrap:anywhere}</style>
+</head>
+<body>
+<a class="skip" href="#main">本文へ移動</a>
+<header class="masthead" id="top">
+  <div class="folio"><span class="brand-label"><i aria-hidden="true"></i> KONG · 技術検証レポート</span><span>draft v0.1 · 基準日 2026/11/14</span></div>
+  <div class="headline"><div><p class="eyebrow">どちらを選ぶかではなく、どこに何を置くか</p><h1>AIエージェントのアイデンティティ<br>Auth0とKongの役割と組み合わせ方</h1><p class="deck">公開情報の確認 2026/11/13〜11/14<span class="sep">／</span>実機検証 2026/11/13〜11/14<span class="sep">／</span>基準日 2026/11/14</p></div><button class="print-button" id="print" type="button">印刷・PDF保存</button></div>
+  <div class="source-strip"><span>出典 <strong>Auth0・Kongの公開Docs、MCP・IETF・A2Aの公開仕様</strong></span><span>実測 <strong>Kong AI Gateway 2.3.1（Konnect）、Auth0 Free tenant</strong></span><span>版 <strong>draft v0.1</strong></span><span>公開 <strong>GitHub Pages（2026/11/15）</strong></span></div>
+</header>
+<nav class="navigation" aria-label="レポート内の移動"><a href="#overview">結論</a><a href="#roles">役割の違い</a><a href="#tested">実測結果</a><a href="#compare">要求別の比較</a><a href="#choose">構成の選び方</a><a href="#cautions">留意点</a><a href="#definitions">出典と定義</a></nav>
+<main id="main">
+
+  <section id="overview" aria-labelledby="overview-title">
+    <div class="section-head"><span class="section-number">01</span><div><p class="eyebrow">最初に押さえること</p><h2 id="overview-title">結論</h2></div><span class="scope-chip">公開情報と実測に基づく</span></div>
+    <p class="section-intro">AIエージェントに「誰として」「何を」させるかを決める仕組みは、1つの製品では完結しません。Auth0はtokenを発行するIdP・認可サーバー、Kong AI Gatewayはエージェントの通信経路に立つ強制点です。役割が違うので、基本は置き換えではなく組み合わせです。次の数値は、実機で測ったものです。</p>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">エージェントに見えた第三者token</div><div class="metric-value">0<small>件</small></div><div class="metric-sub">Kong Token VaultでGitHubを代理利用。応答・ログを全件確認</div></div>
+      <div class="metric"><div class="metric-label">Kong側でエージェントを外して止まるまで</div><div class="metric-value">5〜7<small>秒</small></div><div class="metric-sub">Auth0発行のtokenに対して、tool許可から外した場合（3回）</div></div>
+      <div class="metric"><div class="metric-label">IdP側の取り消し後も発行済みtokenが通った時間</div><div class="metric-value">約10<small>分</small></div><div class="metric-sub">Auth0でgrant削除・secret変更・client削除。token寿命600秒</div></div>
+      <div class="metric"><div class="metric-label">Token Vaultのprovider停止が効くまで</div><div class="metric-value">約5<small>分</small></div><div class="metric-sub">Gatewayのcredential cache（300秒）による。実測282秒</div></div>
+    </div>
+    <div class="focus-list">
+      <div class="focus-item"><strong>役割分担</strong>利用者のログイン、同意、人の承認（CIBA）、委任tokenの発行はAuth0が担います。MCP toolの許可、第三者credentialの注入、通信の停止と記録はKongが担います。</div>
+      <div class="focus-item"><strong>Kongの強み</strong>エージェントに第三者のtokenを渡さずに使わせることと、IdPを変えずにMCP toolの認可をGatewayで一括して強制することです。どちらも今日の公開機能で動くことを確かめました。</div>
+      <div class="focus-item"><strong>止める速さ</strong>発行済みのaccess tokenは、IdPでは取り消せない場合があります。Kongの強制点で外せば数秒で止まります。IdPとKongの両方に停止手順を用意するのが安全です。</div>
+    </div>
+  </section>
+
+  <section id="roles" aria-labelledby="roles-title">
+    <div class="section-head"><span class="section-number">02</span><div><p class="eyebrow">同じ層の製品ではない</p><h2 id="roles-title">役割の違い</h2></div></div>
+    <div class="card"><div class="card-head"><h3>エージェントの通信と、各製品の担当</h3><p>今回検証した構成</p></div>
+      <div class="chart-scroll"><svg viewBox="0 0 960 330" role="img" aria-labelledby="roles-svg-title roles-svg-desc"><title id="roles-svg-title">Auth0がtokenを発行し、Kong AI Gatewayが通信経路で検証・認可・注入する構成</title><desc id="roles-svg-desc">左から利用者、エージェント、Kong AI Gateway、MCP serverとSaaS。上にAuth0があり、利用者のログインとtoken発行を担う。Kong AI Gatewayはtoken検証、tool認可、credential注入を担い、下にKong IdentityのToken VaultとPrincipalがある。</desc>
+        <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#647060"/></marker></defs>
+        <rect x="260" y="14" width="420" height="70" rx="8" fill="#eff3eb" stroke="#819077"/>
+        <text class="chart-title" x="470" y="42" text-anchor="middle">Auth0（IdP・認可サーバー）</text>
+        <text class="chart-label" x="470" y="66" text-anchor="middle">ログイン・同意・token発行・CIBA承認・委任token</text>
+        <rect x="20" y="140" width="150" height="80" rx="8" fill="#f8faf6" stroke="#819077"/>
+        <text class="chart-text" x="95" y="176" text-anchor="middle">利用者</text><text class="chart-label" x="95" y="198" text-anchor="middle">ログイン・承認</text>
+        <rect x="215" y="140" width="170" height="80" rx="8" fill="#f8faf6" stroke="#819077"/>
+        <text class="chart-text" x="300" y="176" text-anchor="middle">エージェント</text><text class="chart-label" x="300" y="198" text-anchor="middle">Auth0のtokenだけを持つ</text>
+        <rect x="430" y="122" width="270" height="116" rx="8" fill="#eff6d3" stroke="#496a30" stroke-width="2"/>
+        <text class="chart-title" x="565" y="150" text-anchor="middle">Kong AI Gateway</text>
+        <text class="chart-label" x="565" y="174" text-anchor="middle">token検証・MCP toolの許可/拒否</text>
+        <text class="chart-label" x="565" y="194" text-anchor="middle">第三者credentialの注入</text>
+        <text class="chart-label" x="565" y="214" text-anchor="middle">停止・記録</text>
+        <rect x="745" y="140" width="195" height="80" rx="8" fill="#f8faf6" stroke="#819077"/>
+        <text class="chart-text" x="842" y="172" text-anchor="middle">MCP server・API</text><text class="chart-label" x="842" y="196" text-anchor="middle">GitHub等のSaaS</text>
+        <rect x="430" y="262" width="270" height="56" rx="8" fill="#f8faf6" stroke="#819077" stroke-dasharray="5 4"/>
+        <text class="chart-text" x="565" y="286" text-anchor="middle">Kong Identity</text><text class="chart-label" x="565" y="306" text-anchor="middle">Token Vault・Principal台帳・M2M用AS</text>
+        <g stroke="#647060" stroke-width="1.6" fill="none"><path d="M170 180H213" marker-end="url(#arrow)"/><path d="M385 180H428" marker-end="url(#arrow)"/><path d="M700 180H743" marker-end="url(#arrow)"/><path d="M565 238V260" marker-end="url(#arrow)"/><path d="M95 140V60H258" marker-end="url(#arrow)"/><path d="M470 84L320 138" marker-end="url(#arrow)"/></g>
+      </svg></div>
+      <p class="footnote">矢印はリクエストの流れ。Kong AI GatewayはAuth0のtokenを検証して通し、必要なときだけToken Vaultから第三者credentialを取り出してupstreamへ付けます。エージェントとMCP clientには第三者のtokenは渡りません。</p>
+    </div>
+    <div class="explanation">
+      <div><span class="label-pill">Auth0の担当</span><h3>誰として動くかを決める</h3><p>利用者のログイン、同意、エージェントへのtoken発行、利用者に代わるtoken交換（OBO、委任の連鎖を<code>act</code>で保持）、高リスク操作の前の非同期承認（CIBA）です。tokenを受けた側での強制は、アプリやMCP serverが実装します。</p></div>
+      <div><span class="label-pill">Kongの担当</span><h3>通信経路で何を許すかを強制する</h3><p>MCP・API・LLMへの通信を1か所で通し、tokenを検証してtool単位で許可・拒否します。第三者のcredentialはGatewayが付けるので、エージェントは持ちません。止めるときもGatewayの設定で済みます。Kong Identityは利用者がログインするIdPの代わりではなく、Gateway側の台帳とcredentialの保管庫です。</p></div>
+    </div>
+  </section>
+
+  <section id="tested" aria-labelledby="tested-title">
+    <div class="section-head"><span class="section-number">03</span><div><p class="eyebrow">公開Docsだけでは言い切れない点を実機で確認</p><h2 id="tested-title">実測結果</h2></div><span class="scope-chip">Kong AI Gateway 2.3.1 · Auth0 Free</span></div>
+    <p class="section-intro">検証は4つです。Konnect上の検証用組織と、ローカルのhybrid data plane（Kong AI Gateway 2.3.1）、Auth0のFree tenant、簡易MCP serverで行いました。結果は検証時点の環境のもので、他の版や構成で同じになるとは限りません。</p>
+    <div class="table-scroll card"><table><caption class="eyebrow" style="text-align:left">4つの検証と主な結果</caption><thead><tr><th scope="col">検証</th><th scope="col">問い</th><th scope="col">結果</th><th scope="col">判定</th></tr></thead><tbody>
+      <tr><td>A. Kong Identityだけで自律エージェント</td><td>IdPを持たないエージェントに、Kong IdentityがM2Mのtokenを発行し、Kong AI GatewayがMCP toolをエージェント単位で制御できるか</td><td>成立。client credentialsで発行したtokenで、tool一覧の絞り込みと403拒否ができた（claim→Consumer Group、client ID、CELの3方式）。拒否された呼び出しはupstreamに届かない。MCP clientはProtected Resource Metadata（RFC 9728）から認可サーバーを見つけられた</td><td><span class="badge good">成立</span></td></tr>
+      <tr><td>A'. Principal台帳で認可</td><td>Kong IdentityのPrincipal属性だけで、エージェント単位にtoolを許可できるか</td><td>成立。CELで<code>principal.metadata</code>を判定。ただし属性変更や無効化の反映はPrincipalのcache（600秒）のため最大10分</td><td><span class="badge good">成立</span> <span class="badge warn">反映に時間</span></td></tr>
+      <tr><td>B. Auth0のtokenでKongがtool認可</td><td>Auth0が発行したエージェントのtoken（client credentials）で、KongがMCP toolをエージェント単位に制御できるか</td><td>成立。claim（Auth0 Actionで付与）、client ID（<code>sub</code>）、scopeの各方式で許可・拒否できた。scope方式の403には<code>insufficient_scope</code>が付き、不足しているscopeが分かる</td><td><span class="badge good">成立</span></td></tr>
+      <tr><td>B'. 止める速さ</td><td>Auth0側で止めたとき、発行済みtokenはKong経由でいつまで通るか。Kong側で止めるとどうか</td><td>Auth0でgrant削除・secret変更・client削除をすると新規発行は1秒以内に止まるが、発行済みtokenは寿命（600秒）まで通った。Auth0にはaccess tokenのintrospectionが無い。Kong側でtool許可から外すと5.4〜6.9秒で403</td><td><span class="badge good">Kong側で数秒</span></td></tr>
+      <tr><td>C. Token VaultでGitHubを代理利用</td><td>Auth0でログインした利用者に代わり、エージェントがMCP経由でGitHubを使えるか。エージェント側にGitHubのtokenが出ないか</td><td>成立。利用者がGitHubを一度承認すると、以後はKongが利用者のGitHub tokenをupstreamへ付けた。エージェント・MCP clientへの応答とログに、GitHubのtokenは0件</td><td><span class="badge good">成立</span></td></tr>
+      <tr><td>C'. Token Vaultの停止</td><td>providerを無効にすると、どれだけで止まるか</td><td>約282秒後に止まった（Gatewayのcredential cache 300秒）。止まった応答はHTTP 500。有効に戻すと約2秒で復帰</td><td><span class="badge warn">即時ではない</span></td></tr>
+    </tbody></table></div>
+    <div class="explanation">
+      <div><span class="label-pill">観測した事実</span><h3>未接続のときの振る舞い</h3><p>利用者がまだGitHubを接続していないと、エージェントに見えるtoolは接続を案内する2つだけでした（<code>token_vault_authenticate</code>と<code>token_vault_check_authentication_status</code>）。本物のtoolは隠れていて、呼ぶと<code>not found</code>になります。案内のtoolは、10分有効の認可URLを返します。</p></div>
+      <div><span class="label-pill">解釈と限界</span><h3>停止は二段で設計する</h3><p>IdP側の停止は新しいtokenを止めますが、発行済みのaccess tokenはJWTの署名検証だけで通り続けます。Kong側のtool許可からの除外は数秒で効きました。Token Vaultのprovider停止は約5分、Principal台帳での停止は最大10分かかります。用途ごとに、どこで止めるかを決めておく必要があります。</p></div>
+    </div>
+  </section>
+
+  <section id="compare" aria-labelledby="compare-title">
+    <div class="section-head"><span class="section-number">04</span><div><p class="eyebrow">エージェントのアイデンティティに求められること</p><h2 id="compare-title">要求別の比較</h2></div><span class="scope-chip">2026/11/14時点の公開情報</span></div>
+    <p class="section-intro">Auth0は公開Docs・changelogの表記、Kongは公開Docs・changelogの表記と今回の実測です。将来の計画は含めていません。「EA」はEarly Access、「GA」は一般提供です。</p>
+    <details class="card compact" open><summary>12の要求ごとの比較表</summary>
+      <div class="controls"><label>要求を探す<input id="detail-search" type="search" placeholder="例：承認、MCP、credential" autocomplete="off"></label><p id="result-count" role="status" aria-live="polite"></p></div>
+      <div class="table-scroll"><table><thead><tr><th scope="col">要求</th><th scope="col">Auth0</th><th scope="col">Kong</th><th scope="col">読み方</th></tr></thead><tbody>
+        <tr data-search-row><td>エージェントの識別・登録</td><td>Agent as Principal（エージェントを専用IDで登録）はEA</td><td>Principal（汎用の主体台帳）はGA。エージェント専用の種別は公開Docsに無い</td><td>どちらもエージェント専用の主体はGAではない</td></tr>
+        <tr data-search-row><td>利用者の代理・自律実行</td><td>OBO token exchange（GA、<code>act</code>で最大5段）、Custom Token Exchange（GA）、client credentials（GA）。利用者不在の代理（Privileged Worker）はEA</td><td>Kong IdentityはM2M（client credentials）のtoken発行。GatewayはRFC 8693のtoken exchangeやEntra OBOを外部の認可サーバーへ中継</td><td>委任tokenの発行はAuth0。Kongは経路で検証・中継する</td></tr>
+        <tr data-search-row><td>最小権限（audience・scope）</td><td>audience、RFC 8707 <code>resource</code>互換（GA）、client grantでscopeを付与</td><td>audience検証、Protected Resource Metadata（RFC 9728）。scopeでtool単位に許可できることを実測</td><td>発行側と検証側で揃えて設計する</td></tr>
+        <tr data-search-row><td>tool単位の認可</td><td>scope・RBAC・Actions。tool単位やRAG文書単位は開発者がFGA（別製品）を組み込む</td><td>MCP toolごとのACLとCEL条件（Principal属性、group、token claim）をGatewayで強制。tool単位のrate limit</td><td>経路での一括強制はKong。データ単位の認可はFGAとアプリ</td></tr>
+        <tr data-search-row><td>委任連鎖・管理者による許可</td><td><code>act</code>の入れ子（GA）。Cross App Access（ID-JAG）はOpen EA／Beta</td><td>公開Docsでの提供は確認できない</td><td>Auth0が先行（ただしXAAはEA）</td></tr>
+        <tr data-search-row><td>人の非同期承認</td><td>CIBA＋RAR（GA、Enterprise planまたはadd-on）</td><td>提供なし</td><td>Auth0の明確な強み。Kong構成でもAuth0のCIBAを併用できる</td></tr>
+        <tr data-search-row><td>第三者credentialの管理</td><td>Token Vault（GA）。Organizations単位の分離（GA）。取得したtokenはアプリへ渡る</td><td>Token Vault（GA、AI Gateway 2.3以上、Konnect必須）。エージェントはcredentialを持たず、Gatewayが注入（実測）</td><td>漏えい時の影響範囲はKongが小さい。provider数・SDK・org分離はAuth0が厚い</td></tr>
+        <tr data-search-row><td>MCP</td><td>Auth for MCP（GA）：MCP serverの保護、CIMD手動登録、OBO。Dynamic CIMDはEA</td><td>MCPの集約・tool ACL・credential注入。MCP 2025-11-25と2026-07-28（stateless）に対応（実測）</td><td>MCPの認可サーバー＝Auth0、MCPのgateway＝Kongの分担が自然</td></tr>
+        <tr data-search-row><td>既存IdPとの共存</td><td>Auth0自身がIdP。企業IdPとはfederation</td><td>外部IdPのtokenを検証して通す。IdPを置き換えない（Auth0で実測）</td><td>KongはIdPがAuth0でもOkta・Entraでも同じ考え方</td></tr>
+        <tr data-search-row><td>停止（kill switch）</td><td>grant・client・secretの変更で新規発行を停止。access tokenのintrospectionは無く、発行済みtokenは寿命まで有効（実測）</td><td>tool許可から外すと数秒（実測）。introspection経路なら約3秒（Kong Identity発行tokenで実測）。Token Vault停止は約5分</td><td>即時停止はKongの強制点で行う</td></tr>
+        <tr data-search-row><td>エージェント自身の認証方式</td><td>client secret。<code>private_key_jwt</code>とmTLSはEnterprise plan（mTLSは追加のadd-onも必要）</td><td>Kong Identityは検証時点でclient secretのみ利用できた</td><td>標準が勧める非対称鍵の認証は、Auth0はEnterpriseで提供、Kongは未提供</td></tr>
+        <tr data-search-row><td>運用形態</td><td>SaaS。SDK多数（LangChain、Vercel AI等）。アプリに組み込む型</td><td>Konnect＋data plane（hybrid可）。エージェント側の変更はGateway経由にすることが中心</td><td>組み込み型か経路型か。data residencyは個別に確認</td></tr>
+      </tbody></table></div><p id="no-results" class="empty" hidden>一致する要求はありません。</p>
+    </details>
+  </section>
+
+  <section id="choose" aria-labelledby="choose-title">
+    <div class="section-head"><span class="section-number">05</span><div><p class="eyebrow">条件で決める</p><h2 id="choose-title">構成の選び方</h2></div></div>
+    <div class="card"><div class="card-head"><h3>基本形：Auth0とKongの組み合わせ</h3><p>検証B・Cで動作を確認</p></div>
+      <div class="table-scroll"><table><thead><tr><th scope="col">順番</th><th scope="col">担当</th><th scope="col">何をするか</th></tr></thead><tbody>
+        <tr><td>1</td><td>Auth0（または既存のIdP）</td><td>利用者をログインさせ、エージェントへaccess tokenを発行する。高リスク操作はCIBAで利用者の承認を取る</td></tr>
+        <tr><td>2</td><td>Kong AI Gateway</td><td>エージェントからのMCP・API・LLMへの通信を受け、Auth0のtokenを検証し、tool単位に許可・拒否する。scopeで許可するのが最も素直</td></tr>
+        <tr><td>3</td><td>Kong Token Vault</td><td>MCP経路で第三者SaaSを使うときは、Auth0を信頼するIdPに指定し、利用者ごとのcredentialをGatewayで注入する。エージェントにtokenを渡さない</td></tr>
+        <tr><td>4</td><td>両方</td><td>停止手順を二段で用意する。IdPで新規発行を止め、Kongで発行済みtokenの通行を止める</td></tr>
+      </tbody></table></div>
+      <p class="footnote">エージェントが第三者SaaSのSDKを直接使う構成ならAuth0 Token Vault、MCPやAPIの経路を通す構成ならKong Token Vaultを選び、同じ接続を両方に登録しないようにします。</p>
+    </div>
+    <div class="explanation">
+      <div><span class="label-pill">Kongが合う条件</span><h3>経路で統制したい</h3><p>利用者認証のIdPは決まっていて変えたくない。エージェントからMCP server・社内API・LLMへの通信を1か所で強制し、記録したい。GitHub・Slack・Google等のcredentialをエージェントやMCP clientに持たせたくない。MCP toolの利用可否をIdPのgroupやscopeでまとめて制御したい。すでにKong GatewayやKonnectを使っている。</p></div>
+      <div><span class="label-pill">Kongだけでは足りない条件</span><h3>他の製品やアプリで補う</h3><p>利用者のログインやCIAMそのもの（→Auth0等のIdP）。高リスク操作の前の人の承認（→Auth0のCIBA）。RAGの文書単位やtool引数単位の認可（→FGAやアプリ）。Token Vaultを完全オンプレミスや閉域で動かす（→現状不可、Konnect必須）。B2B SaaSで顧客組織ごとにエージェント連携を提供する（→Auth0のOrganizationsとToken Vaultが先行）。</p></div>
+    </div>
+    <div class="card"><div class="card-head"><h3>自律エージェント（利用者がいない）の場合</h3><p>検証A</p></div>
+      <p class="section-intro" style="margin:0">IdPを持たない自律エージェントなら、Kong IdentityのM2M用認可サーバー、Kong AI Gateway、Token Vaultで一式がKong内に収まり、tool単位の制御まで動きました。ただし、エージェント自身の認証は検証時点でclient secretだけでした。MCPの拡張仕様やIETFのdraft、主要IdPは静的なsecretを避け、<code>private_key_jwt</code>・mTLS・workload identityを勧めています。社内PoCや、短い寿命のtokenとsecretの定期的な入れ替えで運用できる用途に向きます。本番の標準準拠を求める場合は、提案前に提供状況を確認してください。</p>
+    </div>
+  </section>
+
+  <section id="cautions" aria-labelledby="cautions-title">
+    <div class="section-head"><span class="section-number">06</span><div><p class="eyebrow">PoC・設計の前に</p><h2 id="cautions-title">留意点</h2></div></div>
+    <details class="card compact" open><summary>業界標準の現状</summary>
+      <p>自律エージェントがtokenを得るのにclient credentials grantを使うのは、共通のパターンです（MCPの拡張「OAuth Client Credentials」はStable）。一方で、エージェントがclientとして自分を証明する方式は、静的なsecretから、非対称鍵（<code>private_key_jwt</code>）、mTLS、workload identityへ移っています。IETFのエージェント関連文書はまだdraft（例：<code>draft-ietf-wimse-aims</code>）で、「IETF標準」と言える段階ではありません。A2A Protocol v1はエージェントのidentityを規定せず、AgentCardで認証方式を示すだけです。主要IdPはエージェントを専用の主体として扱い始めています（Microsoft Entra Agent ID、Okta for AI AgentsはGA、Auth0 Agent as PrincipalはEA）。</p>
+    </details>
+    <details class="card compact" open><summary>設計時の注意（実測で分かったこと）</summary>
+      <div class="table-scroll"><table><thead><tr><th scope="col">項目</th><th scope="col">内容</th></tr></thead><tbody>
+        <tr><td>1つのMCP serverの認証設定</td><td>MCP serverに付けられる認証設定は1つだけでした。1つの設定に複数のissuerを許可すれば2つのIdPのtokenを通せますが、MCP clientへ案内される認可サーバーは1つになり、group名も共有になります。IdPを混在させるなら経路を分けるのが安全です</td></tr>
+        <tr><td>scopeの判定</td><td>scope方式では、scope文字列を空白で分割する指定（<code>.scope | split(" ")</code>）が必要でした</td></tr>
+        <tr><td>Token Vaultの設定形</td><td>MCP serverに<code>token_vault</code>と<code>datastores</code>を指定する形で動きました。復号用の秘密鍵は、Konnectには<code>{vault://…}</code>の参照としてのみ登録でき、実体はdata plane側に置きます</td></tr>
+        <tr><td>認可URLのホスト</td><td>Token Vaultの認可URLとcallbackは、data planeが受けたリクエストのホストとポートから作られます。前段にロードバランサーがある場合は、転送ヘッダーの扱いを先に決めてください</td></tr>
+        <tr><td>停止時の応答</td><td>Token Vaultのproviderを止めたときの応答はHTTP 500でした。エージェント側で再接続の案内として扱えるかは未確認です</td></tr>
+        <tr><td>Auth0 tokenの寿命</td><td>ログインから第三者SaaSの承認、tool呼び出しまでの間にtokenが切れないよう、APIのtoken寿命を設計してください（検証では600秒で一度失効）</td></tr>
+        <tr><td>拒否時の応答形式</td><td>tool ACLで拒否されたときは、JSON-RPCのエラーではなくHTMLの403が返りました</td></tr>
+      </tbody></table></div>
+    </details>
+  </section>
+
+  <section id="definitions" aria-labelledby="definitions-title">
+    <div class="section-head"><span class="section-number">07</span><div><p class="eyebrow">数字と根拠の読み方</p><h2 id="definitions-title">出典と定義</h2></div></div>
+    <div class="card"><div class="definition-grid">
+      <p><strong>対象範囲</strong><br>Auth0の「Secure AI Agents &amp; MCP Servers」関連機能と、Kong AI Gateway・Kong Identity（Token Vault、Principal、Auth Server）。価格と契約条件は比較していません。将来の計画・roadmapは含めていません。</p>
+      <p><strong>公開情報の出典</strong><br>Auth0 Docs・changelog（2026/11/13確認。<code>private_key_jwt</code>のplan条件は「Application Credentials」で2026/11/14確認）。Kong Docs（developer.konghq.com、Token Vault・AI Gateway changelog 2.3.0（2026/11/04）ほか、2026/11/13確認）。MCP仕様と拡張、IETF draft、A2A Protocol v1.0.1。</p>
+      <p><strong>実測の条件</strong><br>Kong Konnect（us region）の検証用組織、Kong AI Gateway 2.3.1のhybrid data plane（ローカルDocker）、Auth0 Free tenant、Python製の簡易MCP server、GitHub OAuth App（<code>read:user</code>のみ）。2026/11/13〜11/14に実施。</p>
+      <p><strong>実測と推論の区別</strong><br>表中の「実測」は検証環境で観測した結果です。cacheの秒数など、理由の説明にはdata planeのソースを読んだ推論を含みます。Auth0のEA機能とEnterprise限定機能は実機で試していません。</p>
+      <p><strong>未確認の事項</strong><br>Auth0 Token Vaultとの同条件での比較、Token Vaultの利用者credential削除とSaaS側の許可取り消しの挙動、Konnectの監査ログへの記録、Kong AI Gateway 2.3.1以外の版での挙動。</p>
+      <p><strong>保存版</strong><br>このレポートは基準日時点の固定版です。製品の提供状態は変わるため、提案や設計の前に最新のDocsで確認してください。</p>
+    </div></div>
+  </section>
+</main>
+<footer class="report-footer"><span>Kong · AIエージェントのアイデンティティ検証 · draft v0.1（2026/11/14）</span><a href="#top">先頭へ戻る ↑</a><span>vault-report-light/v1</span></footer>
+<script>/* vault-report-light/v1 — local interactions only */
+document.getElementById('print')?.addEventListener('click', () => window.print());
+const search = document.getElementById('detail-search');
+const rows = [...document.querySelectorAll('[data-search-row]')];
+function filterRows() {
+  const query = (search?.value || '').normalize('NFKC').toLocaleLowerCase().trim();
+  let count = 0;
+  rows.forEach(row => {
+    row.hidden = !row.textContent.normalize('NFKC').toLocaleLowerCase().includes(query);
+    if (!row.hidden) count++;
+  });
+  const status = document.getElementById('result-count');
+  if (status) status.textContent = `表示 ${count} / 全${rows.length}件`;
+  const empty = document.getElementById('no-results');
+  if (empty) empty.hidden = count !== 0;
+}
+search?.addEventListener('input', filterRows);
+filterRows();
+let printState = null;
+window.addEventListener('beforeprint', () => {
+  if (printState) return;
+  printState = {
+    details: [...document.querySelectorAll('details')].map(el => [el, el.open]),
+    rows: rows.map(el => [el, el.hidden])
+  };
+  printState.details.forEach(([el]) => { el.open = true; });
+  rows.forEach(el => { el.hidden = false; });
+});
+window.addEventListener('afterprint', () => {
+  if (!printState) return;
+  printState.details.forEach(([el, open]) => { el.open = open; });
+  printState.rows.forEach(([el, hidden]) => { el.hidden = hidden; });
+  printState = null;
+});
+</script>
+</body>
+</html>
