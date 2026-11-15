@@ -1,0 +1,468 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="color-scheme" content="light"><meta name="report-template" content="vault-report-light/v1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'"><title>Box MCP接続方法と拡張・実際の制約と導入価値</title><style>/* vault-report-light/v1: generic styles extracted from management-light-ja/v4 */
+:root{--page:#d7ded4;--surface:#f8faf6;--ink:#263b2d;--text:#3f473e;--muted:#647060;--line:#b5c0af;--lime:#ccff00;--pale:#eff6d3;--amber:#f1d89c;--red:#a14132;--white:#fff;--radius:10px;font-family:"Funnel Sans","Hiragino Sans","Yu Gothic",system-ui,sans-serif;color:var(--text);background:var(--page);font-size:15px}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:78px}body{margin:0}button,input,select{font:inherit}button,a,input,select,summary{-webkit-tap-highlight-color:transparent}a{color:var(--ink);text-underline-offset:4px}button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid #709c00;outline-offset:3px}.skip{position:absolute;top:-70px;left:20px;background:var(--lime);padding:10px;z-index:9}.skip:focus{top:10px}.masthead{max-width:1440px;margin:28px auto 0;padding:25px 44px 28px;border:1px solid #a8b4a1;position:relative}.masthead:before,.masthead:after{content:"+";position:absolute;font-size:22px;line-height:20px;color:#60715d;top:-10px}.masthead:before{left:-7px}.masthead:after{right:-7px}.folio{display:flex;justify-content:space-between;align-items:center;font-size:12px;letter-spacing:.09em;color:#53604e}.brand-label{font-weight:800;display:flex;align-items:center;gap:10px;color:var(--ink)}.brand-label i{display:inline-block;width:11px;height:11px;background:var(--lime);border:1px solid #83974c}.headline{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:28px 0 24px}.eyebrow{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.05em;margin:0 0 9px}h1{font-size:clamp(30px,3.5vw,49px);line-height:1.2;letter-spacing:-.03em;margin:0;color:var(--ink);font-weight:800}.deck{font-size:15px;margin:17px 0 0;line-height:1.7}.sep{margin:0 14px;color:#8a9684}.print-button{padding:11px 17px;border:1px solid #82917b;background:transparent;color:var(--ink);border-radius:30px;cursor:pointer;white-space:nowrap}.print-button:hover{background:var(--lime)}.source-strip{display:flex;flex-wrap:wrap;gap:8px 24px;font-size:12px;padding-top:16px;border-top:1px solid var(--line)}.source-strip strong{font-weight:700;color:var(--ink)}.navigation{position:sticky;top:0;z-index:5;background:#d7ded4f5;backdrop-filter:blur(10px);display:flex;justify-content:center;gap:8px;flex-wrap:wrap;padding:12px 20px;border-bottom:1px solid var(--line);margin-top:18px}.navigation a{text-decoration:none;font-size:13px;padding:9px 17px;border-radius:30px}.navigation a:hover{background:var(--lime)}main{max-width:1440px;margin:auto;padding:0 44px}section{padding:45px 0 10px}.section-head{display:flex;align-items:center;gap:16px;margin-bottom:22px}.section-number{font-size:15px;color:var(--ink);font-weight:700;background:var(--lime);min-width:37px;height:37px;display:grid;place-items:center;border-radius:50%}.section-head .eyebrow{margin:0 0 4px}h2{font-size:28px;margin:0;line-height:1.3;color:var(--ink);letter-spacing:-.02em}.scope-chip{margin-left:auto;border:1px solid #a6b49e;border-radius:20px;padding:7px 11px;font-size:11px;color:var(--muted);text-align:center}.section-intro{max-width:970px;line-height:1.9;margin:0 0 23px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.metric{border-top:3px solid #819077;padding:20px 22px;background:#eff3eb;min-width:0}.metric:first-child{border-top-color:var(--lime)}.metric-label{font-size:13px;color:var(--muted)}.metric-value{font-size:42px;color:var(--ink);font-weight:750;letter-spacing:-.04em;line-height:1.4;margin:3px 0}.metric-value small{font-size:15px;font-weight:500;margin-left:5px;letter-spacing:0}.metric-sub{font-size:12px;line-height:1.7;color:var(--muted)}.focus-list{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:24px}.focus-item{padding:2px 0 2px 15px;border-left:4px solid var(--lime);font-size:13px;line-height:1.8}.focus-item strong{display:block;color:var(--ink);margin-bottom:3px;font-size:15px}.card{background:var(--surface);border:1px solid #bac6b2;border-radius:var(--radius);padding:23px 26px;margin-bottom:20px;min-width:0;overflow:hidden}.card-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:18px}.card-head h3{font-size:18px;margin:0;color:var(--ink)}.card-head p{font-size:12px;color:var(--muted);margin:0;text-align:right}.chart-scroll{overflow-x:auto;overflow-y:hidden}.chart-scroll svg{display:block;max-width:100%;height:auto;width:100%;min-width:700px}.chart-label{fill:var(--muted);font-size:12px;font-family:inherit}.chart-text{fill:var(--text);font-size:13px;font-family:inherit}.chart-title{fill:var(--ink);font-size:16px;font-weight:700;font-family:inherit}.chart-grid{stroke:#d6ded0;stroke-width:1}.chart-key,.legend{display:flex;gap:12px 24px;align-items:center;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:12px 0}.chart-key span,.legend span{display:flex;align-items:center;gap:8px}.chart-key i,.legend i{width:12px;height:12px;display:inline-block;border-radius:2px}.footnote{font-size:12px;line-height:1.85;color:var(--muted);margin:16px 0 0}.controls{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 16px;margin-bottom:20px}.controls>label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;color:var(--muted)}.controls input[type=search],.controls select{border:1px solid #9cad91;background:#f8faf6;color:var(--text);border-radius:6px;padding:10px 12px;height:42px;min-width:155px}.controls input[type=search]{min-width:270px}.controls select{cursor:pointer}.controls fieldset{border:0;margin:0;padding:0}.controls legend{font-size:12px;color:var(--muted);font-weight:600;margin-bottom:8px}.check-row{display:flex;gap:9px;flex-wrap:wrap}.check-row label{font-size:12px;background:#f8faf6;padding:10px 11px;border:1px solid #a6b39d;border-radius:6px;display:flex;align-items:center;gap:7px;cursor:pointer}input[type=checkbox],input[type=radio]{accent-color:#496a30;width:15px;height:15px}.assignment-controls{justify-content:space-between;gap:20px}.segmented{display:flex;border:1px solid #a6b39d;border-radius:6px;background:#f8faf6}.segmented label{padding:10px 13px;display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer}.segmented label+label{border-left:1px solid #c5cebf}.table-scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.65}th{text-align:left;background:#e7ede1;color:var(--ink);font-weight:700;border-bottom:1px solid #a8b69e;padding:11px 13px;white-space:nowrap}td{border-bottom:1px solid #dbe3d4;padding:11px 13px;vertical-align:top}tbody tr:last-child td{border-bottom:0}.numeric{text-align:right;font-variant-numeric:tabular-nums}.matrix th:not(:first-child),.matrix td:not(:first-child){text-align:center}.matrix td{vertical-align:middle}.matrix td.count-cell{font-size:24px;font-weight:650;color:var(--ink);border:5px solid var(--surface);min-width:110px;height:65px;border-radius:7px}.matrix tfoot td{font-weight:700;font-size:15px;background:#e7ede1}.case-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-bottom:20px}.case-card{background:var(--surface);border:1px solid #bac6b2;border-radius:var(--radius);overflow:hidden;min-width:0}.case-card summary{list-style:none;cursor:pointer;padding:19px 21px;display:block}.case-card summary::-webkit-details-marker{display:none}.case-title-row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.case-title{font-size:17px;line-height:1.5;font-weight:700;color:var(--ink)}.case-age{font-size:21px;font-weight:700;color:var(--ink);white-space:nowrap;line-height:1.3}.case-age small{font-size:11px;font-weight:500;margin-left:3px}.case-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px;align-items:center}.badge{border-radius:4px;padding:3px 7px;font-size:11px;background:#e6ecdf;color:#52624b}.badge.warn{background:#f0dfaa;color:#6d5323}.badge.good{background:#e4f0b1;color:#3e5d20}.case-preview{font-size:12px;line-height:1.8;color:var(--muted);margin:12px 0 0}.expand-label{font-size:11px;color:#526846;display:block;margin-top:12px}.case-content{padding:0 21px 21px;border-top:1px solid #dde5d6}.case-content dl{margin:0}.case-content dt{font-size:11px;font-weight:700;color:var(--muted);margin:18px 0 5px}.case-content dd{margin:0;font-size:13px;line-height:1.85;overflow-wrap:anywhere}.case-content .crm-name{font-size:11px;color:var(--muted);margin-top:6px}.case-content .record-list{margin:0;padding-left:19px;font-size:12px;line-height:1.9}.compact summary{font-size:14px;font-weight:650;color:var(--ink);cursor:pointer;line-height:1.5}.compact[open] summary{margin-bottom:20px}.compact p{font-size:13px;line-height:1.8}.history-panel+.history-panel{border-top:1px solid #d6dfce;padding-top:23px;margin-top:20px}.history-panel h4{font-size:16px;margin:0 0 8px;color:var(--ink)}.history-panel svg{display:block;width:100%;min-width:660px;height:auto}.history-panel{overflow-x:auto}.explanation{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:25px 0}.explanation>div{border-left:4px solid var(--lime);padding:10px 20px 10px 18px}.label-pill{font-size:11px;font-weight:600;color:#52614b}.explanation h3{font-size:18px;color:var(--ink);margin:9px 0}.explanation p{font-size:13px;line-height:1.95;margin:0}.definition-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 35px;margin-top:18px}.definition-grid p{font-size:12px;line-height:1.9;color:var(--muted)}.definition-grid strong{font-size:13px;color:var(--ink)}.report-footer{max-width:1352px;margin:40px auto 28px;padding:20px 0 0;border-top:1px solid #9eae95;display:flex;justify-content:space-between;gap:15px;font-size:11px;color:var(--muted)}.report-footer a{font-size:12px}.empty{padding:26px;font-size:14px;color:var(--muted);text-align:center}#tooltip{position:fixed;z-index:20;pointer-events:none;max-width:330px;white-space:pre-line;background:#263b2df2;color:white;padding:10px 13px;border-radius:6px;font-size:12px;line-height:1.7;box-shadow:none}.noscript{padding:30px;background:#fff5ca;text-align:center}.pos-over{color:#99432d;font-weight:700}.data-note{font-size:11px;color:var(--muted);margin:5px 0 0}
+@media(max-width:1100px){.masthead{margin:18px 22px 0;padding:24px 28px}main{padding:0 28px}.metrics{gap:10px}.metric{padding:16px}.metric-value{font-size:35px}.focus-list{gap:15px}.report-footer{margin-left:28px;margin-right:28px}.navigation{justify-content:flex-start}.navigation a{padding:8px 11px}.case-grid{grid-template-columns:1fr}.scope-chip{max-width:170px}.card{padding:21px}.folio{font-size:11px}}
+@media(max-width:650px){:root{font-size:14px}.masthead{margin:14px 14px 0;padding:20px}.headline{display:block;margin:23px 0}.print-button{margin-top:18px;font-size:12px;padding:8px 13px}.folio{gap:15px;font-size:10px;letter-spacing:0}.deck{font-size:12px}.sep{margin:0 7px}.source-strip{gap:7px 16px;font-size:10px}main{padding:0 16px}.navigation{gap:2px;padding:8px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap}.navigation a{padding:8px 11px;font-size:11px}.metrics{grid-template-columns:1fr 1fr}.metric-value{font-size:34px}.metric-label{font-size:11px}.metric-sub{font-size:10px}.focus-list{grid-template-columns:1fr;gap:16px}.section-head{gap:10px}.section-number{min-width:31px;height:31px;font-size:12px}.section-head h2{font-size:23px}.section-head .eyebrow{font-size:10px}.scope-chip{display:none}.section-intro{font-size:12px}.card{padding:17px 15px}.card-head{display:block}.card-head p{text-align:left;margin-top:7px}.controls{gap:12px}.controls input[type=search]{min-width:230px}.controls select{min-width:135px}.controls>label{flex:1}.check-row label{font-size:11px;padding:8px}.explanation,.definition-grid{grid-template-columns:1fr}.report-footer{margin:30px 16px;flex-wrap:wrap;font-size:10px}.legend{font-size:11px;gap:8px 15px}.card-head h3{font-size:16px}section{padding-top:33px}}
+
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{html{scroll-behavior:auto}body,:root{background:white;color:#222;font-size:10pt}.masthead{margin:0;padding:14px;border:1px solid #aaa}.navigation,.controls,.print-button,.skip,.expand-label,#tooltip{display:none!important}main{max-width:none;padding:0}section{padding:22px 0 4px;break-inside:auto}.card,.case-card{background:white;border:1px solid #bbb;break-inside:avoid;margin-bottom:12px;overflow:visible}.chart-scroll,.table-scroll,.history-panel{overflow:visible}.chart-scroll svg,.history-panel svg{min-width:0;width:100%}.case-grid{display:block}.case-card{margin-bottom:10px}.metrics{gap:8px}.metric{background:#f6f7f3}.metric-value{font-size:25pt}.report-footer{margin-top:20px}.source-strip,.footnote{font-size:8pt}.card-head h3{font-size:13pt}h1{font-size:26pt}h2{font-size:19pt}h3{font-size:13pt}table{font-size:8pt}th,td{padding:6px}.focus-list{gap:12px}.case-content{font-size:9pt}.case-content dd{font-size:9pt}.case-content dt{font-size:8pt}.case-card summary{padding:10px 15px}.case-preview{font-size:9pt}.scope-chip{font-size:8pt}.definition-grid{grid-template-columns:1fr 1fr}.explanation p{font-size:9pt}.report-footer{font-size:8pt}}
+
+
+/* Generic report additions */
+[hidden]{display:none!important}caption{text-align:left;color:var(--muted);padding:0 0 12px;font-size:12px}td{overflow-wrap:anywhere}.table-scroll table{min-width:640px}.controls p{font-size:12px;color:var(--muted)}
+@media(max-width:650px){.controls input[type=search]{min-width:0;width:100%}.source-strip{overflow-wrap:anywhere}.folio{flex-wrap:wrap}.headline h1{overflow-wrap:anywhere}}
+@media print{.table-scroll table{min-width:0;table-layout:fixed}thead{display:table-header-group}tr{break-inside:avoid}#no-results{display:none!important}.card{break-inside:auto}h2,h3,summary{break-after:avoid}.navigation{position:static}}
+</style><style>@media(min-width:1101px){.masthead{max-width:min(1440px,calc(100% - 44px))}}code{overflow-wrap:anywhere;word-break:break-word}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#eef2e9;padding:20px;border-radius:6px;line-height:1.7}td:first-child{min-width:190px;max-width:340px}p,li{overflow-wrap:anywhere}.identity-fields td:first-child{min-width:130px}article+article{margin-top:24px}ol li+li,ul li+li{margin-top:8px}@media(max-width:600px){td:first-child{min-width:150px}.headline h1{font-size:30px}.table-scroll{max-width:100%}}@media print{pre{font-size:9pt}td:first-child{min-width:0;max-width:none}table{font-size:8pt}}</style><style>.c-mask{fill:var(--surface)}.c-frontend,.c-external{fill:var(--surface);stroke:#75816f}.c-security{fill:var(--lime);stroke:#5c713e}.t-primary{fill:var(--ink)}.t-muted,.t-backend{fill:var(--text)}.a-default,.a-emphasis{fill:none;stroke:#617257;stroke-width:2}.a-emphasis{stroke-width:2.5}.m-default,.m-emphasis{fill:#617257}.c-backend,.c-region,.c-security-group{fill:var(--surface);stroke:#75816f}.c-backend{fill:#edf1e8}.c-security-group{fill:#cdd4cb33;stroke-dasharray:7 6}.t-security,.t-frontend,.t-external{fill:var(--ink)}.m-security,.m-dashed{fill:#617257}.s-security{stroke:#617257;fill:none}.a-security{stroke:#617257;fill:none}
+
+.a-dashed{fill:none;stroke:#617257;stroke-width:2;stroke-dasharray:6 5}.c-security-group{fill:#cdd4cb55;stroke:#75816f;stroke-width:1.5;stroke-dasharray:7 6}:root{--ink:#263b2d;--surface:#f8faf6;--lime:#ccff00}.report-diagram{margin:26px 0;padding:22px;border:1px solid #aeb5a7;background:#edf1e8}.report-diagram svg{display:block;width:100%;height:auto;max-height:650px}.report-diagram text{font-family:"Funnel Sans","Hiragino Sans","Yu Gothic",sans-serif}.report-diagram figcaption{margin-top:16px;font-size:13px;color:#647060}.c-frontend,.c-external,.c-cloud{fill:#f8faf6;stroke:#75816f}.c-backend{fill:#e7ede5;stroke:#75816f}.c-security{fill:#ccff00;stroke:#75816f}.c-region{fill:#cdd4cb44;stroke:#75816f}.c-security-group{fill:#cdd4cb33;stroke:#75816f;stroke-dasharray:7 6}.t-primary,.t-security,.t-cloud,.t-frontend,.t-external{fill:#263b2d}.t-muted,.t-backend{fill:#647060}.a-default,.a-emphasis,.a-security{fill:none;stroke:#617257;stroke-width:2}.a-emphasis{stroke-width:3}.m-default,.m-emphasis,.m-security{fill:#617257}.edge-label-mask{fill:#edf1e8}.report-diagram .t-security,.report-diagram [data-boundary-label]{paint-order:stroke;stroke:#edf1e8;stroke-width:5px}.report-diagram .diagram-title{display:none}@media(max-width:600px){.report-diagram{padding:10px;margin:20px 0}.navigation a{font-size:12px}}</style><style>
+.report-diagram{--diagram-bg:#edf1e8}.report-diagram .c-region,.report-diagram .c-security-group,.report-diagram .c-lane{fill:none!important}.report-diagram [data-boundary-label],.report-diagram .t-security,.report-diagram text{stroke:none!important;paint-order:normal!important}.report-diagram .edge-label-mask{fill:var(--diagram-bg);stroke:none}.report-diagram .c-mask{stroke:none}.report-diagram .a-security{stroke:#617257;fill:none}.report-diagram .t-dim{fill:#647060}.report-diagram .figure-scroll{overflow-x:auto}.detail-sequence svg{max-height:none;min-width:900px}.detail-sequence .t-primary{font-size:18px}.detail-sequence [data-node-label]{font-weight:700}@media(max-width:600px){.report-diagram:not(.detail-sequence) svg{min-width:750px}}
+</style></head><body><a class="skip" href="#main">本文へ移動</a><header class="masthead" id="top"><div class="folio"><span class="brand-label"><i aria-hidden="true"></i> VALIDATION REPORT</span><span>Box MCP接続調査</span></div><div class="headline"><div><p class="eyebrow">Copilot Studio → Kong AI Gateway 2.3.1 → Box MCP</p><h1>Box MCP接続方法と拡張<br>接続設定・検証結果と導入価値</h1><p class="deck">実機検証 2026/11/13–15 ／ 基準 2026/11/15 12:23 JST ／ Azure配置の詳細・EntraとKong Identityの処理・設定定義の用途を追補</p></div><button class="print-button" id="print" type="button">印刷・PDF保存</button></div><div class="source-strip"><span>根拠 <strong>実機証跡・既存接続の定義・一次資料</strong></span><span>版 <strong>v9</strong></span><span>共有範囲 <strong>Kong社内およびお客様（NDA必須）。他への共有不可</strong></span><span>表示 <strong>保存時点の固定版</strong></span></div></header><nav class="navigation" aria-label="レポート内の移動"><a href="#overview">01 結論</a><a href="#connector">02 標準MCP設定</a><a href="#value">03 共通統制</a><a href="#dual-token">04 Entra拡張</a><a href="#evidence">05 実証範囲</a><a href="#environment">06 検証構成</a><a href="#enhancement-2">07 Kong Identity／TV</a><a href="#identity">A 参考: 本人情報</a><a href="#groups">B 参考: グループ</a><a href="#details">C 参考: 36ツール</a><a href="#mcp-settings">D 参考: 設定全文</a></nav><main id="main"><section id="overview" aria-labelledby="overview-title"><div class="section-head"><span class="section-number">01</span><div><h2 id="overview-title">Box本人権限を維持するKong経由接続は成立</h2></div></div><p class="section-intro">Copilot StudioのURLを指定して登録したMCP接続からKong AI Gateway 2.3.1を経由し、本人のBox OAuthトークンをそのままBox MCPへ渡す接続を実証した。Entra OBOやToken Vaultは、この基本中継に必須ではない。</p><div class="card"><h3>成立性を説明する認証・認可の分担</h3><p>Copilot Studioを利用する入口の本人認証・エージェント利用許可と、CopilotからBoxを利用するOAuth・Boxコンテンツ認可は別の連携。入口でEntra IDに認証されたことだけでBox権限が付与されるわけではない。Box OAuthで本人のトークンを取得し、そのトークンをBox MCPへ渡す。</p><p>CopilotとBoxの間にKongを置く基本中継では、同じ本人Boxトークンを保持して転送する。したがってEntraトークンの追加提示やOBOによるBoxトークンへの交換は必須ではない。実際に、追加Entraなしの同じBox OAuth接続でwho_am_iが成功し、isError=falseと同時刻Gateway POST200/202を照合した。これは接続と本人照会の実証で、全ファイル権限・全tool・顧客環境を網羅した試験ではない。</p></div><div class="card"><p><strong>提供資料で修正が必要なのは「直接接続だけが本人権限を保てる」という技術的な結論。</strong>一方、カタログの既製Box接続dialogと、任意URLを指定する標準MCPオンボーディングを区別する。後者は標準UIでURLとBox OAuthを設定でき、独自プラグインやMCPサーバーの開発は不要。資格情報・callback・接続設定の保守・Gateway運用は必要。</p><p>判断の焦点は、この負担を踏まえてもMCP横断の流量・監査観測・ツール統制を共通化する価値があるか。直結にもCopilot StudioとBoxの制御があり、Kong経由を全用途で必須とはしない。</p><p>別資料のスライドは表紙込み10枚。本文1〜4は基本接続とメリット、本文5〜6は組織ルール、本文7は実検証環境、本文8〜9はKong Identity＋Token Vault拡張案。</p></div></section><section id="connector" aria-labelledby="connector-title"><div class="section-head"><span class="section-number">02</span><div><h2 id="connector-title">標準MCP登録でURLとOAuthを指定</h2></div></div><p class="section-intro">URLを入力できる標準画面は存在する。以前の「カスタムMCPコネクタが必要」という説明は、接続登録・内部コネクタ定義と独自実装を区別できず、開発が必要との誤読を招く表現だった。基本中継について独自プラグインやMCPサーバーの開発は不要。</p><div class="table-scroll"><table><thead><tr><th>操作の入口</th><th>指定できること</th><th>今回の確認</th></tr></thead><tbody><tr><td>カタログの既製Box MCP Serverから新しい接続</td><td>既製コネクタの接続項目</td><td>今回のdialogは表示名のみ。URL変更欄を観測していない。別のMCP登録画面と混同しない</td></tr><tr><td>新しいツール→モデル コンテキスト プロトコル</td><td>Server URLと認証方式。OAuth ManualではBoxの資格情報/認可・token URL/scope等</td><td>標準MCPオンボーディング。11/13の実画面記録と現行Microsoft公式手順の双方で確認</td></tr><tr><td>Power AppsでOpenAPIを用いてコネクタを作る</td><td>独自の接続定義や追加パラメータ</td><td>Microsoftが示す別の選択肢。基本中継のためにこの手動作成経路やプログラム開発が必須という意味ではない</td></tr></tbody></table></div><div class="card"><h3>基本中継の設定</h3><pre>Copilot Studio：標準のMCP登録画面
+  Server URL → KongのHTTPS MCP URL
+  認証 → Box OAuthを設定
+
+Copilot Studio ── 本人Box Bearer ──→ Kong
+              ── 同じBearerを維持 ──→ Box MCP</pre><p>Boxの認可URL・token URL、専用Client ID/Secret、必要なscope、Copilotのcallbackを設定し、本人がBoxへの利用を認可する。Kongは既存Box MCPへ標準の中継経路を構成する。MCPサーバーやKongプラグインを新規開発する必要はない。</p><p>Power PlatformはMCP接続にもコネクタ基盤を使うため、生成された接続定義の編集・管理をCustom connectorsから行う場合がある。この管理上の呼称を「カスタムプラグインの開発」と読み替えない。今回のEntra追加ヘッダーは接続定義の追加設定であり、Entraなしの基本中継とは分ける。</p><h3>残る作業負担</h3><ul><li>URLとBox OAuthの接続登録、資格情報/scope/callbackの設定・保守。</li><li>接続設定の環境展開・更新、利用者ごとのBox接続の管理。</li><li>Gatewayの経路/TLS/可用性/監視/費用と責任分界の設定・運用。</li></ul><p>Entra追加ヘッダー、Entra専用App/FIC、OBO、Token Vaultは基本中継の必須条件ではない。標準UIでの登録だけで認証なしに使えるという意味でもない。</p></div><p class="footnote"><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent">Microsoft公式：既存MCPサーバーへの接続（推奨の標準wizardとPower Appsでの別経路）</a>。URL入力の実画面記録は実機ledgerの11/13初期確認。カタログBox接続dialogの観測はURL指定可能な標準MCP画面の不存在を意味しない。</p></section><section id="value" aria-labelledby="value-title"><div class="section-head"><span class="section-number">03</span><div><h2 id="value-title">Entraなしでも、MCP通信の共通統制・運用を追加</h2></div></div><div class="table-scroll"><table><thead><tr><th>統制が必要になる条件</th><th>Kongで設定する機能</th><th>期待できる変化</th><th>今回の確認範囲</th></tr></thead><tbody><tr><td>複数のAIクライアントやツール呼出しが接続先へ集中</td><td>MCPメソッド/ツール等の流量上限</td><td>共通の上限で利用量・集中負荷を管理</td><td>製品機能の文書確認。流量制限の発動・性能効果は未実測</td></tr><tr><td>接続ごとのログと制御判断を横断的に調査</td><td>MCP通信の観測・監査、ACL判断ログ</td><td>調査の共通窓口と、経路/認可判断の追跡</td><td>Gateway受領/上流HTTP・安全な診断metadataを実測。監査基盤への保全・検索統合は未構築</td></tr><tr><td>Boxのコンテンツ権限に加えて、使用できるMCPツールを制限</td><td>本人識別とMCP tool ACL</td><td>複数クライアントへ同じ利用ポリシーを適用</td><td>Box本人・management/test所属取得まで実測。照会結果と認可処理の連携、許可/拒否は未実施</td></tr></tbody></table></div><div class="card"><p>Boxのコンテンツ権限は引き続きBoxが判定する。Kongで許可してもBoxの権限は拡大しない。CopilotのDLP・ツール設定とBoxのアプリ/ファイル権限は維持し、その上でKongを通るMCP通信に共通のルールを追加する。</p><p>グループACLには、同じBox Bearerによる本人照会と所属照会、信頼できる結果と認可主体の対応付けが必要。who_am_iの結果や任意のヘッダーをそのまま信頼する構成にはしない。グループ名の変更・重複に影響されにくいgroup.idを候補とし、失敗時拒否・失効・所属変更・キャッシュ・API負荷も設計する。</p><p>価値は共通統制が必要な基盤で評価する。設定が少なく単一のBox接続で足りる場合、追加構築が常に有利とはしない。直結経路の利用を禁止する要件があれば、Kongだけでなくネットワーク・DLP等を含む経路の強制設計が別途必要。</p></div><p class="footnote"><a href="https://developer.konghq.com/ai-gateway/entities/ai-mcp-server/">Kong MCP governance・rate limiting・ACL・logging</a>。MCPはAPIレベルの通信であり、LLMプロンプト向けの全機能をそのまま適用するとの訴求は行わない。</p></section><section id="dual-token" aria-labelledby="dual-token-title"><div class="section-head"><span class="section-number">04</span><div><h2 id="dual-token-title">Entra追加送信と、Box前の除去を確認</h2></div></div><div class="card"><h3>保存・実行した構成</h3><pre>Copilot Studio：手動認証 / 会社の専用Entra App・FIC
+Box接続：既存の読み取り専用OAuth / Invoker
+
+入力定義（静的な参照式。実トークン値ではない）
+inputs:
+  - kind: ManualTaskInput
+    propertyName: "'entra-access-token'"
+    value: =System.User.AccessToken
+
+Copilot Studio → Kong
+  Authorization：既存Box接続のBearer
+  entra-access-token：Entraアクセストークン（生JWT）
+
+Kong → Box MCP
+  Authorization：受領したBox Bearerを維持
+  entra-access-token：削除</pre><p>独自ヘッダーは既存コネクタのOpenAPIへ追加し、標準の入力・変数ピッカーから設定した。ツールはwho_am_iだけ許可。Entra署名検証用のAuth Strategyは今回追加していない。</p></div><div class="card"><h3>確認結果</h3><p>System.User.AccessTokenを参照した新テストセッションで、Entra追加ヘッダーを受領。JWT構文true（3 segments）、Box上流前の削除true、Box Authorization不変true、HTTP 200を確認した。トークンの署名・issuer・audience・期限・group claimの検証とACL強制は未実施。</p></div><p>この結果は、EntraをKongの認証・認可に使う構成の前提となる送信経路が成立したことを示す。次は署名・issuer・audience・期限等の検証が必要。有効なEntra本人とBox本人が同じ人物かどうかの対応付けは、別の要件として決める。複数利用者、期限切れ、refresh、全MCPメソッドへの付与は未検証。</p><p class="footnote"><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-end-user-authentication">Copilot認証変数</a>、<a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/configuration-authentication-azure-ad">専用Entra認証/FIC</a>、<a href="https://microsoft.github.io/mcscatblog/posts/mcp-custom-headers/">Microsoft CATのMCP追加ヘッダー設定</a></p><div class="card"><h3>Entra/Security GroupでACLを行う場合の追加作業</h3><div class="table-scroll"><table><thead><tr><th>担当領域</th><th>作業</th><th>現在の状態</th></tr></thead><tbody><tr><td>Entra ID</td><td>Gateway向けAPI/scope、専用App/SP/FIC、本人認証・同意</td><td>本検証で設定・本人認証済み。新client secretなし</td></tr><tr><td>Copilot Studio</td><td>手動認証、追加header入力、User.AccessToken参照の固定割当</td><td>実送信成功。設定変更後の新テストセッションで反映を確認</td></tr><tr><td>Entra ID</td><td>対象アクセストークンへSecurity GroupのObject IDを発行し、実返却と省略時の扱いを確認</td><td>未実施。単にEntraへサインインしただけで所属が必ず届くとはしない</td></tr><tr><td>AI Gateway</td><td>追加ヘッダーを読むOIDC AI Auth Strategy。署名・固定tenantのissuer・Gateway audience・期限・必要scopeを検証</td><td>未設定・未実測。JWT構文trueは検証済み本人の証拠ではない</td></tr><tr><td>AI Gateway</td><td>検証済みgroup claimまたは対応付けた主体をMCP ACLへ連携し、ツール別の許可/拒否を宣言</td><td>未実施。AI Consumer GroupとEntra Groupは自動的に同じものではない</td></tr><tr><td>AI Gateway</td><td>認証→ACL判定→Entra header削除→Box Bearerのみ転送へ順序変更。OIDCの自動上流token転送も制御</td><td>現在のPre-Function診断は先にheaderを削除するため、そのままOIDCを追加しない</td></tr></tbody></table></div><p>標準の「Microsoftで認証」ではUser.AccessTokenを利用できず、本検証は手動認証を使用。実運用チャネルの要件・DLP・公開/配備権限は別途確認。多数所属などでgroupsが省略された場合の扱いも必要で、必要なら別の適切な権限のGraph照会を設計する。Gateway向けtokenをそのままGraph向けtokenとして使わない。</p><p>Entra本人とBox本人を必ず同じ人物に限定する場合は、検証済みのEntra IDとBox IDの対応付けを要件化する。二つの有効なtokenの同時提示だけで同一人物は証明されない。</p><p class="footnote"><a href="https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/how-to-connect-fed-group-claims">Entraのgroup claim発行・省略条件</a>、<a href="https://developer.konghq.com/ai-gateway/openid-connect/">AI Gateway OIDC</a>、<a href="https://developer.konghq.com/plugins/pre-function/">Pre-Functionの実行順序</a>。</p></div></section><section id="evidence" aria-labelledby="evidence-title"><div class="section-head"><span class="section-number">05</span><div><h2 id="evidence-title">実証済み・構成可能・未実施を分ける</h2></div></div><div class="table-scroll"><table><thead><tr><th>確認事項</th><th>結果</th><th>証跡</th></tr></thead><tbody><tr><td>既製Box MCP直結</td><td>who_am_i成功。Kongは経由しない</td><td>2026-11-13_builtin-direct.json</td></tr><tr><td>カスタム直結 / Kong経由</td><td>who_am_i成功。Entra追加なしのKong経由が成立</td><td>2026-11-14_custom-direct.json / kong-e2e.json</td></tr><tr><td>同じBox bearerのREST/MCP本人情報</td><td>/users/me既定17・指定30項目、who_am_i10項目。id一致</td><td>2026-11-14_box-identity-verified-results.json</td></tr><tr><td>本人group</td><td>management/testの2件、いずれもmember。group.id等あり</td><td>2026-11-14_group-verified-summary.json</td></tr><tr><td>CopilotのEntra追加送信</td><td>1634文字・segment3・JWT構文true、上流前削除true、Box Authorization不変true、HTTP200</td><td>2026-11-15_copilot-entra-token-restarted-metadata.json</td></tr><tr><td>JWT署名/issuer/audience/期限・Security Group claim</td><td>今回未実証</td><td>signature_verified=false。実claim値の取得・保存なし</td></tr><tr><td>ACL強制・複数ユーザー・失効/refresh・本人対応付け</td><td>今回未実証</td><td>次の検証候補</td></tr></tbody></table></div><p>対象は検証用Free Developerの1ユーザーと会社Copilotの専用agent。実値・断片・hash・claims/profileはEntra診断に記録せず、Boxの個人ID/氏名/メール等も項目名・型・一致boolに限定した。Box group名と所属roleは合意された検証対象。Box企業role/MCP userTypeはACL条件へ採用しない。</p></section><section id="environment" aria-labelledby="environment-title"><div class="section-head"><span class="section-number">06</span><div><h2 id="environment-title">今回の実機検証構成：ACA・AI Gateway・Konnect</h2></div></div><p class="section-intro">専用検証環境をMicrosoft Azure Container Apps（ACA）上に構築し、Konnect（US）からAI Gatewayを管理した。クラウド構成は宣言的に保存している。Token VaultとKong Identityはこの実測環境には追加していない。</p><figure class="report-diagram"><div class="figure-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 15 1380 735" role="img" lang="ja" aria-labelledby="v9-validation-detail-r05-archify-diagram-title v9-validation-detail-r05-archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+        <title id="v9-validation-detail-r05-archify-diagram-title">検証環境の配置・通信・認証分離の詳細</title>
+        <desc id="v9-validation-detail-r05-archify-diagram-description">An architecture diagram generated by Archify.</desc>
+        
+        <defs>
+          <marker id="v9-validation-detail-r05-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="v9-validation-detail-r05-arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="v9-validation-detail-r05-arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="v9-validation-detail-r05-arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="v9-validation-detail-r05-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5" />
+          </pattern>
+        </defs>
+
+        
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" data-composition-frame-label="Microsoft管理サービス" x="40" y="40" width="380" height="400" rx="12" class="c-region" stroke-width="1" />
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="1" data-composition-frame-label="検証用Azure subscription ／ Japan East" x="605" y="265" width="390" height="345" rx="12" class="c-region" stroke-width="1" />
+
+        
+        <path data-edge-from="detail-idp" data-edge-to="detail-agent" data-edge-label="本人認証／Entra A" data-edge-key="0" data-edge-id="detail-idp-auth" data-composition-points="230,180;230,310" d="M 230 180 L 230 310" class="a-default" stroke-width="1.5" marker-end="url(#v9-validation-detail-r05-arrowhead)" />
+        <path data-edge-from="detail-agent" data-edge-to="detail-dp" data-edge-label="HTTPS：Box B＋追加A" data-edge-key="1" data-edge-id="detail-client-call" data-composition-points="380,358;650,358" d="M 380 358 L 650 358" class="a-emphasis" stroke-width="1.8" marker-end="url(#v9-validation-detail-r05-arrowhead-emphasis)" />
+        <path data-edge-from="detail-dp" data-edge-to="detail-box" data-edge-label="HTTPS：Box Bのみ" data-edge-key="2" data-edge-id="detail-up-call" data-composition-points="950,358;1020,358;1020,130;1090,130" d="M 950 358 L 1012 358 Q 1020 358 1020 350 L 1020 138 Q 1020 130 1028 130 L 1090 130" class="a-emphasis" stroke-width="1.8" marker-end="url(#v9-validation-detail-r05-arrowhead-emphasis)" />
+        <path data-edge-from="detail-dp" data-edge-to="detail-rest" data-edge-label="診断時のみ／同じBox B" data-edge-key="3" data-edge-id="detail-rest-call" data-composition-points="950,372;1090,372" d="M 950 372 L 1090 372" class="a-default" stroke-width="1.5" marker-end="url(#v9-validation-detail-r05-arrowhead)" />
+        <path data-edge-from="detail-dp" data-edge-to="detail-cp" data-edge-label="mTLS管理接続" data-edge-key="4" data-edge-id="detail-mgmt" data-composition-points="650,372;495,372;495,660;340,660" d="M 650 372 L 503 372 Q 495 372 495 380 L 495 652 Q 495 660 487 660 L 340 660" class="a-default" stroke-width="1.5" marker-end="url(#v9-validation-detail-r05-arrowhead)" />
+
+        
+        <g id="v9-validation-detail-r05-node-detail-idp" data-node-id="detail-idp" data-node-label="Entra ID" data-node-kind="security" data-node-sublabel="会社テナント／専用App・FIC">
+          <title>Entra ID · 会社テナント／専用App・FIC · Microsoft管理サービス</title>
+          <rect x="80" y="80" width="300" height="100" rx="6" class="c-security" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(86 86) scale(0.6875)" visibility="hidden">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z" />
+            <path d="m5.8 8 1.5 1.5 3-3" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="230" y="121.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Entra ID</text>
+        <text data-detail="context" x="230" y="157.0" class="t-muted" font-size="17" text-anchor="middle">会社テナント／専用App・FIC</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-agent" data-node-id="detail-agent" data-node-label="Copilot Studio" data-node-kind="frontend" data-node-sublabel="標準MCP／Box OAuth接続">
+          <title>Copilot Studio · 標準MCP／Box OAuth接続 · Microsoft管理サービス</title>
+          <rect x="80" y="310" width="300" height="110" rx="6" class="c-frontend" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(86 316) scale(0.6875)" visibility="hidden">
+            <rect x="2" y="3" width="12" height="10" rx="2" />
+            <path d="M2 6.5h12" />
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill" />
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="230" y="356.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Copilot Studio</text>
+        <text data-detail="context" x="230" y="392.0" class="t-muted" font-size="17" text-anchor="middle">標準MCP／Box OAuth接続</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-dp" data-node-id="detail-dp" data-node-label="AI Gateway 2.3.1" data-node-kind="security" data-node-sublabel="/box-mcp／Bearerを保持">
+          <title>AI Gateway 2.3.1 · /box-mcp／Bearerを保持 · 検証用Azure subscription ／ Japan East</title>
+          <rect x="650" y="310" width="300" height="110" rx="6" class="c-security" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(656 316) scale(0.6875)" visibility="hidden">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z" />
+            <path d="m5.8 8 1.5 1.5 3-3" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="800" y="356.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">AI Gateway 2.3.1</text>
+        <text data-detail="context" x="800" y="392.0" class="t-muted" font-size="17" text-anchor="middle">/box-mcp／Bearerを保持</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-aca" data-node-id="detail-aca" data-node-label="Container Apps" data-node-kind="backend" data-node-sublabel="1 CPU・2 GiB／min0・max1">
+          <title>Container Apps · 1 CPU・2 GiB／min0・max1 · 検証用Azure subscription ／ Japan East</title>
+          <rect x="650" y="500" width="300" height="90" rx="6" class="c-backend" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(656 506) scale(0.6875)" visibility="hidden">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="800" y="536.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Container Apps</text>
+        <text data-detail="context" x="800" y="572.0" class="t-muted" font-size="17" text-anchor="middle">1 CPU・2 GiB／min0・max1</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-box" data-node-id="detail-box" data-node-label="Box MCP" data-node-kind="external" data-node-sublabel="https://mcp.box.com">
+          <title>Box MCP · https://mcp.box.com · Architecture component</title>
+          <rect x="1090" y="80" width="260" height="100" rx="6" class="c-external" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1096 86) scale(0.6875)" visibility="hidden">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5" />
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1220" y="121.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Box MCP</text>
+        <text data-detail="context" x="1220" y="157.0" class="t-muted" font-size="17" text-anchor="middle">https://mcp.box.com</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-rest" data-node-id="detail-rest" data-node-label="Box REST API" data-node-kind="external" data-node-sublabel="/users/me・memberships">
+          <title>Box REST API · /users/me・memberships · Architecture component</title>
+          <rect x="1090" y="310" width="260" height="110" rx="6" class="c-external" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1096 316) scale(0.6875)" visibility="hidden">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5" />
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="1220" y="356.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Box REST API</text>
+        <text data-detail="context" x="1220" y="392.0" class="t-muted" font-size="17" text-anchor="middle">/users/me・memberships</text>
+        </g>
+
+        <g id="v9-validation-detail-r05-node-detail-cp" data-node-id="detail-cp" data-node-label="Konnect（US）" data-node-kind="cloud" data-node-sublabel="Control Plane／Policy管理">
+          <title>Konnect（US） · Control Plane／Policy管理 · Architecture component</title>
+          <rect x="80" y="610" width="260" height="100" rx="6" class="c-cloud" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(86 616) scale(0.6875)" visibility="hidden">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z" />
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="210" y="651.0" class="t-primary" font-size="24" font-weight="700" text-anchor="middle">Konnect（US）</text>
+        <text data-detail="context" x="210" y="687.0" class="t-muted" font-size="17" text-anchor="middle">Control Plane／Policy管理</text>
+        </g>
+
+        
+        <g data-detail="context" data-edge-from="detail-idp" data-edge-to="detail-agent" data-edge-label="本人認証／Entra A" data-edge-key="0" data-edge-id="detail-idp-auth" data-label-mask="needed">
+          <rect x="150.965" y="217.0" width="158.06999999999996" height="22.0" class="edge-label-mask" rx="0" /><text x="230" y="235" class="t-muted" font-size="17" text-anchor="middle" font-weight="700">本人認証／Entra A</text>
+        </g>
+        <g data-detail="context" data-edge-from="detail-agent" data-edge-to="detail-dp" data-edge-label="HTTPS：Box B＋追加A" data-edge-key="1" data-edge-id="detail-client-call" data-label-mask="none">
+          <text x="515" y="348" class="t-backend" font-size="17" text-anchor="middle" font-weight="700">HTTPS：Box B＋追加A</text>
+        </g>
+        <g data-detail="context" data-edge-from="detail-dp" data-edge-to="detail-box" data-edge-label="HTTPS：Box Bのみ" data-edge-key="2" data-edge-id="detail-up-call" data-label-mask="needed">
+          <rect x="944.45" y="216.0" width="151.0999999999999" height="22.0" class="edge-label-mask" rx="0" /><text x="1020" y="234" class="t-backend" font-size="17" text-anchor="middle" font-weight="700">HTTPS：Box Bのみ</text>
+        </g>
+        <g data-detail="context" data-edge-from="detail-dp" data-edge-to="detail-rest" data-edge-label="診断時のみ／同じBox B" data-edge-key="3" data-edge-id="detail-rest-call" data-label-mask="needed">
+          <rect x="958.475" y="369.0" width="123.05000000000007" height="22.0" class="edge-label-mask" rx="0" /><text x="1020" y="387" class="t-muted" font-size="17" text-anchor="middle" font-weight="700">REST診断（B）</text>
+        </g>
+        <g data-detail="context" data-edge-from="detail-dp" data-edge-to="detail-cp" data-edge-label="mTLS管理接続" data-edge-key="4" data-edge-id="detail-mgmt" data-label-mask="needed">
+          <rect x="437.98" y="488.0" width="114.03999999999996" height="22.0" class="edge-label-mask" rx="0" /><text x="495" y="506" class="t-muted" font-size="17" text-anchor="middle" font-weight="700">mTLS管理接続</text>
+        </g>
+
+        
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="0" data-composition-frame-kind="region" data-composition-frame-label="Microsoft管理サービス">
+          <text data-boundary-label="" x="48" y="73" class="t-cloud" font-size="18" font-weight="700">Microsoft管理サービス</text>
+        </g>
+
+        <g data-graph-role="structural-frame-label" data-composition-frame-id="1" data-composition-frame-kind="region" data-composition-frame-label="検証用Azure subscription ／ Japan East">
+          <text data-boundary-label="" x="613" y="303" class="t-cloud" font-size="18" font-weight="700">Azure検証環境 ／ Japan East</text>
+        </g>
+
+        
+
+      </svg></div><figcaption>図06-1：実測した経路と管理接続。ACAの公開HTTPSでTLS終端し、内部HTTPでコンテナへ到達。追加AはGatewayで削除し、Box Bのみを上流へ転送。</figcaption></figure><div class="card"><h3>配置と境界</h3><p>スライド08の外枠はMicrosoft／Azureクラウドの論理的な配置。Entra IDとCopilot StudioはMicrosoft管理サービスであり、検証用AzureサブスクリプションやACAのVNetへ自前配置したものではない。自分たちで構築した稼働基盤はJapan EastのContainer Apps環境と、そのコンテナ上のAI Gatewayである。</p><h3>通信経路・認証・管理の詳細</h3><ol><li>Copilot Studioの標準MCP接続から、ACAの公開FQDNのHTTPS /box-mcpへ要求する。ACAのTLS終端からGatewayコンテナまでは内部HTTP。HTTPS入口を別のアプリケーション要素としては設けていない。</li><li>基本試験ではBox OAuthのBearer Bを受領してそのままBox MCPへ転送。Entra追加送信試験では同じAuthorization: Bearer Bにentra-access-token: Aを追加し、GatewayでAを削除してからBoxへ送る。</li><li>Gatewayはhttps://mcp.box.comへHTTPSで接続。本人/グループ診断時のみ、同じBでhttps://api.box.com/2.0/users/meとmembershipsも照会した。常時の認可処理にはまだ組み込んでいない。</li><li>Konnect（US）とはデータプレーン用証明書のmTLS管理接続を使用。Control Planeの設定とPolicyを反映する。CopilotからBoxへの業務データ通信をKonnect経由にする構成ではない。</li></ol><p>この実測環境ではKong Identity／Token Vault／Entra署名検証／組織ACLは未構築。既存診断Policyのヘッダー削除順序は、将来の認証・ACL導入時に変更が必要。</p></div><div class="table-scroll"><table><thead><tr><th>構成要素</th><th>検証時の構成</th></tr></thead><tbody><tr><td>Copilot Studio</td><td>会社環境の専用エージェント。標準MCP登録のBox OAuth接続。後半は手動Entra認証と追加ヘッダー。</td></tr><tr><td>Azure Container Apps</td><td>Japan East／Consumption、1 CPU・2 GiB、min0・max1。測定中のみmin1。ACAの公開HTTPS入口でTLSを終端し、コンテナへ内部HTTPで転送。</td></tr><tr><td>AI Gateway</td><td>2.3.1のdigest固定イメージ。/box-mcpのpass-through経路。Box Authorizationを保持、EntraヘッダーはBox前に除去。</td></tr><tr><td>Konnect</td><td>USの専用AI Gatewayリソース。mTLS管理接続によって設定・Policyを連携。Boxのデータ通信をKonnect経由にする構成ではない。</td></tr><tr><td>Box</td><td>Free Developerの専用読み取りOAuth。MCPはhttps://mcp.box.com、RESTはhttps://api.box.com/2.0。</td></tr><tr><td>診断・稼働</td><td>データ/トークン値は収集せず、形式・除去・認証保持等を測定。診断期限は終了済み、測定後min0。max1・既存費用枠を維持。</td></tr><tr><td>宣言的な構成</td><td>AzureはTerraform、KonnectとAI Gatewayリソースはkongctl YAML。接続OpenAPI／TaskDialog等は付録D。</td></tr></tbody></table></div></section><section id="enhancement-2" aria-labelledby="enhancement-2-title"><div class="section-head"><span class="section-number">07</span><div><h2 id="enhancement-2-title">Kong IdentityとToken Vaultで接続先資格情報を集約</h2></div></div><p class="section-intro">公開仕様に基づくKong Identity＋Token Vaultの拡張構成案。今回のBox接続PoCには未適用・未実証。「Entra IDのみ」はクライアントがGatewayへ提示する入口の資格情報を指し、各サービスがEntra tokenをそのまま受け付けるという意味ではない。</p><div class="card"><h3>入口Aと接続先Bを分ける</h3><p>Token Vaultは信頼する企業IdPのtokenを検証し、issuer/subjectで主体を識別する。Gatewayがprovider別の登録から対応するcredentialを取得し、上流要求へ付与する。Entraが任意のSaaS tokenを発行する仕組みではない。</p><p>初回には管理者のIdP/provider設定と、利用者ごと・接続先ごとのOAuth同意・アカウント連携が必要。未連携なら登録導線へ進む。登録後も、各サービスの権限・scope・失効条件は残る。Gatewayは入口の認証とツール利用ルールを別途構成する。</p><p class="footnote"><a href="https://developer.konghq.com/identity/token-vault/">Token Vaultの主体識別・provider・credential enrollment</a>。</p></div><div class="table-scroll"><table><thead><tr><th>観点</th><th>エンハンスメント1：組織ルール追加</th><th>エンハンスメント2：資格情報連携</th></tr></thead><tbody><tr><td>クライアントからの提示</td><td>Box Bと追加のEntra A</td><td>Gateway入口のEntra A</td></tr><tr><td>Box用資格情報の利用</td><td>Copilotの本人Box接続から受け取り保持</td><td>GatewayがToken Vaultのprovider別登録から取得・付与</td></tr><tr><td>主な狙い</td><td>Box権限にEntra組織基準のMCP利用制御を追加</td><td>接続先/クライアントが増えても資格情報の連携・管理を共通化</td></tr><tr><td>前提</td><td>追加header・検証済みgroup等・ACL設定</td><td>Konnect TV有効化・trusted IdP・本人紐付け・provider/OAuth連携</td></tr><tr><td>今回の状態</td><td>送信と分離転送は実証、署名/組織ACLは未実証</td><td>構成案。Copilotとの登録誘導・Box TV連携も未実証</td></tr></tbody></table></div><p>二つの拡張は併用できる。Token Vaultは資格情報の連携を担い、MCPツールの認可はGateway、データの認可は各サービスが担う。Gatewayを通るクライアントに接続先credentialを持たせる範囲を減らすという価値がある。</p><div class="card"><h3>接続先と導入条件</h3><ul><li>GitHub/Slackは公開provider templateの例。Boxはcustom-oauth候補であり、Box固有の正式適合・callback/scope/refresh・Copilotでの初回認可と完了反映は別途確認。</li><li>Konnect Token Vaultを利用する構成。完全on-premで単独稼働する保管庫とはしない。対象org/region/製品版・有効化条件を採用時に確認。</li><li>必要な利用者だけに資格情報が対応すること、複数利用者の分離、同意取消し・失効・更新失敗と運用責任を実証する。今回の検証で構築・資格情報保存は追加していない。</li></ul></div><p class="footnote"><a href="https://developer.konghq.com/ai-gateway/entities/ai-mcp-server/#token-vault">AI MCP ServerのToken Vault upstream連携</a>。拡張図のGitHub/Slack/Boxは説明用の接続先で、顧客環境の導入済み構成ではない。</p><div class="card"><h3>Kong Identityは必須。Entra利用者はいつ登録されるか</h3><p>Token VaultはKonnectのKong Identity Directoryを境界として使う。Directoryのvault_enabledを有効化し、vault keyを登録する。Entra IDをtrusted IdPとして設定し、vault_access_enabled=trueでToken Vaultへのアクセスを許可する。</p><p><strong>条件を満たせば初回利用時に自動登録される。</strong>trusted IdPのjit_provisioning_enabled=true（既定値）で、受信トークンのissuer（iss）とsubject（sub）に一致するPrincipalがない場合、Kong IdentityがPrincipalを自動作成し、本人用資格情報を紐付ける。既存の一致するPrincipalは再利用する。JITを無効にする場合は事前登録・対応付けを設計する。</p><p>Entra IDに登録済みの全ユーザーを自動で一括同期する意味ではない。Entraのgroup所属が自動同期されるとも、このJIT仕様だけからは言えない。Token Vaultは公開鍵を取得してトークンを検証する方式で、利用者情報を企業IdPへ直接照会しない。</p><p>Principalの自動作成と、Box等の接続先に対する本人OAuth同意は別。未連携の接続先には初回enrollmentが必要。Kong Identity／TV／JIT／Box固有連携は今回未構築・未実証。</p><p class="footnote"><a href="https://developer.konghq.com/identity/token-vault/#trusted-idp">Kong公式：Trusted IdP・JIT provisioning</a>、<a href="https://developer.konghq.com/identity/token-vault/#directory">Directoryと暗号化境界</a>、<a href="https://developer.konghq.com/identity/">Kong Identity</a>（2026/11/15確認）。</p></div><figure class="report-diagram detail-sequence"><div class="figure-scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 700" role="img" lang="ja" aria-labelledby="v9-vault-runtime-r05-archify-diagram-title v9-vault-runtime-r05-archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+        <title id="v9-vault-runtime-r05-archify-diagram-title">Entra認証からToken Vaultによる資格情報解決まで</title>
+        <desc id="v9-vault-runtime-r05-archify-diagram-description">A sequence diagram generated by Archify.</desc>
+        
+        <defs>
+          <marker id="v9-vault-runtime-r05-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="v9-vault-runtime-r05-arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="v9-vault-runtime-r05-arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="v9-vault-runtime-r05-arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="v9-vault-runtime-r05-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5" />
+          </pattern>
+        </defs>
+
+        
+        <path d="M 157 142 L 157 635" class="a-default" stroke-width="0.8" stroke-dasharray="3,7" />
+        <path d="M 404 142 L 404 635" class="a-default" stroke-width="0.8" stroke-dasharray="3,7" />
+        <path d="M 651 142 L 651 635" class="a-default" stroke-width="0.8" stroke-dasharray="3,7" />
+        <path d="M 898 142 L 898 635" class="a-default" stroke-width="0.8" stroke-dasharray="3,7" />
+        <path d="M 1145 142 L 1145 635" class="a-default" stroke-width="0.8" stroke-dasharray="3,7" />
+
+        
+
+
+        
+        <g data-edge-from="runtime-client" data-edge-to="runtime-idp" data-edge-label="1 本人認証・token要求" data-edge-key="0" data-edge-id="runtime-0" data-label-mask="none">
+          <path data-composition-edge-from="runtime-client" data-composition-edge-to="runtime-idp" data-composition-edge-id="runtime-0" data-composition-points="164,160;397,160" d="M 164 160 L 397 160" class="a-default" stroke-width="1.4" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <text x="280.5" y="150" class="t-backend" font-size="18" text-anchor="middle" font-weight="600">1 本人認証・token要求</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-idp" data-edge-to="runtime-client" data-edge-label="2 Entra token A" data-edge-key="1" data-edge-id="runtime-1" data-label-mask="none">
+          <path data-composition-edge-from="runtime-idp" data-composition-edge-to="runtime-client" data-composition-edge-id="runtime-1" data-composition-points="397,205;164,205" d="M 397 205 L 164 205" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <text x="280.5" y="195" class="t-muted" font-size="18" text-anchor="middle" font-weight="600">2 Entra token A</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-client" data-edge-to="runtime-gw" data-edge-label="3 MCP呼出し＋A" data-edge-key="2" data-edge-id="runtime-2" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-client" data-composition-edge-to="runtime-gw" data-composition-edge-id="runtime-2" data-composition-points="164,250;644,250" d="M 164 250 L 644 250" class="a-emphasis" stroke-width="1.8" marker-end="url(#v9-vault-runtime-r05-arrowhead-emphasis)" />
+        <g data-detail="context">
+          <rect x="334.38" y="221.0" width="139.24" height="23.0" class="edge-label-mask" rx="0" /><text x="404" y="240" class="t-backend" font-size="18" text-anchor="middle" font-weight="600">3 MCP呼出し＋A</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-gw" data-edge-to="runtime-ki" data-edge-label="4 provider資格情報要求＋A" data-edge-key="3" data-edge-id="runtime-3" data-label-mask="none">
+          <path data-composition-edge-from="runtime-gw" data-composition-edge-to="runtime-ki" data-composition-edge-id="runtime-3" data-composition-points="658,295;891,295" d="M 658 295 L 891 295" class="a-security" stroke-width="1.4" marker-end="url(#v9-vault-runtime-r05-arrowhead-security)" />
+        <g data-detail="context">
+          <text x="774.5" y="285" class="t-security" font-size="18" text-anchor="middle" font-weight="600">4 資格情報要求＋A</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-ki" data-edge-to="runtime-idp" data-edge-label="5 JWKS取得（必要時）" data-edge-key="4" data-edge-id="runtime-4" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-ki" data-composition-edge-to="runtime-idp" data-composition-edge-id="runtime-4" data-composition-points="891,340;411,340" d="M 891 340 L 411 340" class="a-default" stroke-width="1.4" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <rect x="554.38" y="311.0" width="193.24" height="23.0" class="edge-label-mask" rx="0" /><text x="651" y="330" class="t-backend" font-size="18" text-anchor="middle" font-weight="600">5 JWKS取得（必要時）</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-idp" data-edge-to="runtime-ki" data-edge-label="6 公開署名鍵" data-edge-key="5" data-edge-id="runtime-5" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-idp" data-composition-edge-to="runtime-ki" data-composition-edge-id="runtime-5" data-composition-points="411,385;891,385" d="M 411 385 L 891 385" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <rect x="591.46" y="356.0" width="119.07999999999993" height="23.0" class="edge-label-mask" rx="0" /><text x="651" y="375" class="t-muted" font-size="18" text-anchor="middle" font-weight="600">6 公開署名鍵</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-ki" data-edge-to="runtime-gw" data-edge-label="7 対応するBox Bを解放" data-edge-key="6" data-edge-id="runtime-6" data-label-mask="none">
+          <path data-composition-edge-from="runtime-ki" data-composition-edge-to="runtime-gw" data-composition-edge-id="runtime-6" data-composition-points="891,460;658,460" d="M 891 460 L 658 460" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <text x="774.5" y="450" class="t-muted" font-size="18" text-anchor="middle" font-weight="600">7 対応するBox Bを解放</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-gw" data-edge-to="runtime-box" data-edge-label="8 Box Bのみで呼出し" data-edge-key="7" data-edge-id="runtime-7" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-gw" data-composition-edge-to="runtime-box" data-composition-edge-id="runtime-7" data-composition-points="658,515;1138,515" d="M 658 515 L 1138 515" class="a-emphasis" stroke-width="1.8" marker-end="url(#v9-vault-runtime-r05-arrowhead-emphasis)" />
+        <g data-detail="context">
+          <rect x="805.61" y="486.0" width="184.77999999999997" height="23.0" class="edge-label-mask" rx="0" /><text x="898" y="505" class="t-backend" font-size="18" text-anchor="middle" font-weight="600">8 Box Bのみで呼出し</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-box" data-edge-to="runtime-gw" data-edge-label="9 Box本人権限での結果" data-edge-key="8" data-edge-id="runtime-8" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-box" data-composition-edge-to="runtime-gw" data-composition-edge-id="runtime-8" data-composition-points="1138,560;658,560" d="M 1138 560 L 658 560" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <rect x="797.15" y="531.0" width="201.70000000000005" height="23.0" class="edge-label-mask" rx="0" /><text x="898" y="550" class="t-muted" font-size="18" text-anchor="middle" font-weight="600">9 Box本人権限での結果</text>
+        </g>
+        </g>
+
+        <g data-edge-from="runtime-gw" data-edge-to="runtime-client" data-edge-label="10 MCP応答" data-edge-key="9" data-edge-id="runtime-9" data-label-mask="needed">
+          <path data-composition-edge-from="runtime-gw" data-composition-edge-to="runtime-client" data-composition-edge-id="runtime-9" data-composition-points="644,605;164,605" d="M 644 605 L 164 605" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#v9-vault-runtime-r05-arrowhead)" />
+        <g data-detail="context">
+          <rect x="352.38" y="576.0" width="103.24000000000001" height="23.0" class="edge-label-mask" rx="0" /><text x="404" y="595" class="t-muted" font-size="18" text-anchor="middle" font-weight="600">10 MCP応答</text>
+        </g>
+        </g>
+
+        
+        <g id="v9-vault-runtime-r05-node-runtime-client" data-node-id="runtime-client" data-node-label="Copilot Studio" data-node-kind="frontend">
+          <title>Copilot Studio · Sequence participant</title>
+          <rect x="62" y="72" width="190" height="54" rx="6" class="c-frontend" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(68 78) scale(0.6875)" visibility="hidden">
+            <rect x="2" y="3" width="12" height="10" rx="2" />
+            <path d="M2 6.5h12" />
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill" />
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill" />
+          </g>
+          <text data-node-label="" x="157" y="100" class="t-primary" font-size="18" font-weight="600" text-anchor="middle">Copilot Studio</text>
+        </g>
+
+        <g id="v9-vault-runtime-r05-node-runtime-idp" data-node-id="runtime-idp" data-node-label="Entra ID" data-node-kind="security">
+          <title>Entra ID · Sequence participant</title>
+          <rect x="309" y="72" width="190" height="54" rx="6" class="c-security" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(315 78) scale(0.6875)" visibility="hidden">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z" />
+            <path d="m5.8 8 1.5 1.5 3-3" />
+          </g>
+          <text data-node-label="" x="404" y="100" class="t-primary" font-size="18" font-weight="600" text-anchor="middle">Entra ID</text>
+        </g>
+
+        <g id="v9-vault-runtime-r05-node-runtime-gw" data-node-id="runtime-gw" data-node-label="AI Gateway" data-node-kind="security">
+          <title>AI Gateway · Sequence participant</title>
+          <rect x="556" y="72" width="190" height="54" rx="6" class="c-security" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(562 78) scale(0.6875)" visibility="hidden">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z" />
+            <path d="m5.8 8 1.5 1.5 3-3" />
+          </g>
+          <text data-node-label="" x="651" y="100" class="t-primary" font-size="18" font-weight="600" text-anchor="middle">AI Gateway</text>
+        </g>
+
+        <g id="v9-vault-runtime-r05-node-runtime-ki" data-node-id="runtime-ki" data-node-label="Kong Identity / TV" data-node-kind="cloud">
+          <title>Kong Identity / TV · Sequence participant</title>
+          <rect x="803" y="72" width="190" height="54" rx="6" class="c-cloud" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(809 78) scale(0.6875)" visibility="hidden">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z" />
+          </g>
+          <text data-node-label="" x="898" y="100" class="t-primary" font-size="18" font-weight="600" text-anchor="middle">Kong Identity / TV</text>
+        </g>
+
+        <g id="v9-vault-runtime-r05-node-runtime-box" data-node-id="runtime-box" data-node-label="Box MCP" data-node-kind="external">
+          <title>Box MCP · Sequence participant</title>
+          <rect x="1050" y="72" width="190" height="54" rx="6" class="c-external" stroke-width="1.5" />
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1056 78) scale(0.6875)" visibility="hidden">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5" />
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5" />
+          </g>
+          <text data-node-label="" x="1145" y="100" class="t-primary" font-size="18" font-weight="600" text-anchor="middle">Box MCP</text>
+        </g>
+
+        
+        </svg></div><figcaption>図07-1：資格情報を登録済みの利用者の通常呼出し（構成案・未実証）。Entraはtoken Aを発行し、Kong Identityは公開署名鍵でAを検証。Token Vaultのprovider登録からBox Bを解決し、Gatewayへだけ解放する。</figcaption></figure><div class="card"><h3>図07-1のやり取りと、Kong Identity内の処理</h3><div class="table-scroll"><table><thead><tr><th>図の手順</th><th>内容</th></tr></thead><tbody><tr><td>1–2：Entra → Copilot</td><td>Copilot側の本人認証・同意で、対象API向けのEntraアクセストークンAを取得する。ここでは入口にEntraを使用する拡張案を示す。現在のBox接続から自動的にこの構成へ変わるわけではない。</td></tr><tr><td>3–4：Copilot → Gateway → Kong Identity</td><td>クライアントはAを提示。Gatewayは対象Directory/providerに対応する資格情報を要求する。Kong Identityへの資格情報要求はGatewayのmTLS接続を使用し、クライアントはToken Vaultを直接呼ばない。キャッシュが有効な場合の解決経路は短縮され得る。</td></tr><tr><td>5–6：Kong Identity ↔ Entra</td><td>設定したissuerのdiscovery/JWKSから公開署名鍵を取得し、署名・issuer・exp/nbfを確認する。既に鍵を保持している場合は毎要求ごとに取得しない。利用者のパスワード・ユーザープロフィール・グループをEntraへ問い合わせる処理ではない。</td></tr><tr><td>6–7の間：Principalと資格情報の解決</td><td>検証したiss/subでDirectory内のPrincipalを特定。JIT有効で一致するPrincipalがなければ作成する。本人×providerの登録済みcredentialをToken Vaultから解決する。Gateway側の認可ルールや想定audience/scopeの検証も採用構成に合わせて設定する。</td></tr><tr><td>7–10：Box用Bで実行</td><td>登録済みのBox用資格情報BをGatewayで上流要求に付与。Entra AをBox MCPへ渡さず、BoxはBoxの本人権限で認可する。Entra tokenから任意のSaaS tokenを直接生成する仕組みではない。</td></tr></tbody></table></div></div><div class="card"><h3>Box用資格情報が未登録の場合：初回のOAuth連携</h3><ol><li>資格情報の要求に対し、enrollment URLが返る。Gatewayは呼出し元へ初回認可の導線を提示する。</li><li>利用者がブラウザーで導線を開き、Box等の接続先で本人認証と要求scopeへの同意を行う。</li><li>接続先が設定済みのcallbackへ認可コードを返す。Kong Identity／Token Vaultの連携処理が、接続先との間でコードとaccess/refresh tokenを交換し、本人×providerに対応するcredentialを保存する。Gatewayのcallback公開を含む実際の経路とBox側の設定は検証時に照合する。</li><li>登録後の呼出しから、図07-1の7以降へ進める。Copilot Studioでの認可URL提示・完了検知・再試行、Box custom-oauthのcallback/scope/refresh適合は今回未検証。</li></ol><p>PrincipalのJIT登録と、Boxアカウントへの本人同意は別の処理。JITだけではBox用資格情報は作られず、Entraの全ユーザーやSecurity Groupの一括同期も意味しない。</p></div><p class="footnote">一次資料：<a href="https://developer.konghq.com/identity/token-vault/">Token Vault：trusted IdP・JIT・credential enrollment</a>、<a href="https://developer.konghq.com/how-to/get-started-with-token-vault/">Directory/provider/vault keyの構成手順</a>、<a href="https://developer.konghq.com/ai-gateway/entities/ai-mcp-server/#token-vault">MCP upstreamのToken Vault利用・キャッシュ</a>（2026/11/15確認）。Box固有連携とCopilotの初回導線は構成案であり、今回の実機結果には含めない。</p></section><section id="identity" aria-labelledby="identity-title"><div class="section-head"><span class="section-number">A</span><div><h2 id="identity-title">参考: /users/meとMCP who_am_iの本人情報</h2></div></div><div class="table-scroll"><table><thead><tr><th>確認先</th><th>実測</th><th>内容</th></tr></thead><tbody><tr><td>GET /2.0/users/me</td><td>HTTP 200</td><td>既定17項目、fields指定では30項目。MCPと同じBearerを受理。</td></tr><tr><td>who_am_i</td><td>HTTP 200 / isError=false</td><td>10項目。RESTのidとの一致をboolで確認。</td></tr></tbody></table></div><div class="card"><h3>who_am_iで返った全10項目</h3><div class="table-scroll"><table class="identity-fields"><thead><tr><th>項目名</th><th>型</th></tr></thead><tbody><tr><td>id</td><td>string</td></tr><tr><td>login</td><td>string</td></tr><tr><td>userType</td><td>string</td></tr><tr><td>spaceUsed</td><td>number</td></tr><tr><td>spaceAmount</td><td>number</td></tr><tr><td>status</td><td>string</td></tr><tr><td>language</td><td>string</td></tr><tr><td>jobTitle</td><td>string</td></tr><tr><td>name</td><td>string</td></tr><tr><td>timezone</td><td>string</td></tr></tbody></table></div><p>jobTitleは空文字。企業内roleとグループは返らなかった。userTypeを企業内roleと同義には扱わない。</p></div><details class="card compact"><summary>/users/meの項目名を表示</summary><h3>既定17項目</h3><p><code>max_upload_size, job_title, avatar_url, notification_email, timezone, language, id, login, phone, name, address, created_at, type, status, modified_at, space_amount, space_used</code></p><h3>fields指定で確認した追加13項目</h3><p><code>tracking_codes, can_see_managed_users, is_sync_enabled, is_exempt_from_device_limits, is_collaborated_content_available_when_owner_inactive, my_tags, is_platform_access_only, external_app_user_id, is_exempt_from_login_verification, enterprise, role, is_external_collab_restricted, hostname</code></p><p>job_titleは空文字。roleは明示指定時に取得できたが、利用者方針により企業roleとuserTypeはACL条件へ採用しない。非空の役職による判定は未検証。</p></details><p class="footnote">値の保存は検証上合意したrole・役職に限定。ID・氏名・メール等は項目名/型または一致boolだけを保存。Boxトークンは32文字・1区切りの非JWT形式を観測し、トークン自体から本人claimは読めなかった。<a href="https://developer.box.com/reference/get-users-me">Box /users/me</a></p></section><section id="groups" aria-labelledby="groups-title"><div class="section-head"><span class="section-number">B</span><div><h2 id="groups-title">参考: management/testのグループ所属</h2></div></div><div class="card"><pre>同じBoxアクセストークンで照会
+GET /2.0/users/me?fields=id
+  → 得られた本人IDをメモリ内だけで利用
+GET /2.0/users/{本人ID}/memberships?limit=100&amp;offset=0</pre><div class="table-scroll"><table><thead><tr><th>グループ名</th><th>所属role</th><th>その他の確認</th></tr></thead><tbody><tr><td>management</td><td>member</td><td>group.id / membership.idあり、所属user.idが本人と一致</td></tr><tr><td>test</td><td>member</td><td>group.id / membership.idあり、所属user.idが本人と一致</td></tr></tbody></table></div><p>本人情報・所属の両APIはHTTP 200、total_count=2。既存の読み取りOAuth権限を拡張せず取得した。ユーザーが登録したグループ名と所属role以外のID値は保存していない。</p><p>testをadminにする意図との相違は残る。測定時点のAPIとユーザー詳細UIはいずれもmemberで一致しており、admin登録の成功は確認していない。</p></div><p>グループに基づくACLの入力候補は得られた。実装時は名前の変更・重複を考慮してgroup.idを利用し、照会失敗・失効・所属変更・キャッシュを扱う必要がある。Boxの所属が自動的にKong Consumer Groupへ対応付くことや、許可/拒否の強制は今回証明していない。</p><p class="footnote">who_am_iの出力だけではグループは得られない。<a href="https://developer.box.com/reference/get-users-id-memberships">Boxのユーザー所属一覧API</a></p></section><section id="details" aria-labelledby="details-title"><div class="section-head"><span class="section-number">C</span><div><p class="eyebrow">今回の接続に表示された定義</p><h2 id="details-title">参考: Box MCPの36ツール</h2></div><span class="scope-chip">実行済みはwho_am_iのみ</span></div><p class="section-intro">2026/11/14に既存custom接続のUIからtool名・説明・許可状態を読み取った。定義の再読込・ツールの追加実行はしていない。書込・AIの定義が見えていても、Box OAuthの権限付与や実行成功を示さない。</p><details class="card compact"><summary>全36ツールの名前・内容を表示</summary><div class="controls"><label>ツールを探す<input id="detail-search" type="search" placeholder="tool名・分類・内容" autocomplete="off"></label><p id="result-count" role="status" aria-live="polite"></p></div><div class="table-scroll"><table><caption>対象：Box MCP OAuth Lab / 全36定義</caption><thead><tr><th>tool名</th><th>分類</th><th>内容・取得できる情報</th><th>性質</th><th>今回の状態</th></tr></thead><tbody><tr data-search-row><td><code>who_am_i</code></td><td>本人情報</td><td>現在のBox認証ユーザーを取得。入力引数なし。ID・氏名・ログインメール等。</td><td>読取</td><td>実行成功・許可</td></tr><tr data-search-row><td><code>search_folders_by_name</code></td><td>検索・メタデータ</td><td>フォルダ名で検索。親フォルダで範囲を絞り、ID・種類・名前を取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_folder_content_by_folder_id</code></td><td>コンテンツ参照</td><td>指定フォルダ内のファイル・フォルダ・Webリンクをページ単位で取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>search_files_keyword</code></td><td>検索・メタデータ</td><td>キーワードでファイルを検索。拡張子・メタデータ等で絞り込み。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_file_content</code></td><td>コンテンツ参照</td><td>ファイルのMarkdownまたは抽出テキストを取得。表現が未生成の場合は取得不可。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_tasks</code></td><td>コラボレーション</td><td>ファイルのタスク、状態、メッセージ、期限等を取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_file_details</code></td><td>コンテンツ参照</td><td>ファイルID・名前・作成者・更新者・日時を取得。追加指定で権限や版等も参照。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_folder_details</code></td><td>コンテンツ参照</td><td>フォルダID・名前・作成者・日時を取得。追加指定で権限や共同作業設定等も参照。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_file_comments</code></td><td>コラボレーション</td><td>ファイルのコメント本文、投稿者、投稿・更新日時等を取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_item_collaborations</code></td><td>コラボレーション</td><td>ファイル・フォルダの共同作業者、ロール、状態等を取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_metadata_templates</code></td><td>検索・メタデータ</td><td>利用可能なメタデータテンプレートを列挙し、scopeとtemplate keyを確認。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_metadata_template_schema</code></td><td>検索・メタデータ</td><td>指定テンプレートのフィールド定義・キーを取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>search_files_metadata</code></td><td>検索・メタデータ</td><td>テンプレートに対する構造化条件でファイルを検索。フォルダ範囲も指定。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_qa_single_file</code></td><td>Box AI</td><td>単一ファイルの内容についてBox AIへ質問。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_qa_multi_file</code></td><td>Box AI</td><td>複数ファイルを対象にBox AIへ質問し、横断的な回答を取得。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_extract_freeform</code></td><td>Box AI</td><td>自然文の指示でファイルから情報を抽出。固定の出力テンプレートは不要。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_extract_structured_from_fields</code></td><td>Box AI</td><td>指定したフィールド定義に従い、構造化された値を抽出。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_extract_structured_from_fields_enhanced</code></td><td>Box AI</td><td>独自フィールド定義を使うEnhanced Extract。利用条件・課金確認が必要。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_extract_structured_from_metadata_template</code></td><td>Box AI</td><td>既存のBoxメタデータテンプレートに従い構造化抽出。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_extract_structured_from_metadata_template_enhanced</code></td><td>Box AI</td><td>既存テンプレートを使うEnhanced Extract。利用条件・課金確認が必要。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>upload_file</code></td><td>作成・変更</td><td>テキスト内容から新しいファイルをアップロード。任意のバイナリ転送とは異なる。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>create_folder</code></td><td>作成・変更</td><td>親フォルダの配下に新しいフォルダを作成。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>create_file_comment</code></td><td>作成・変更</td><td>指定ファイルへコメントを投稿。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>copy_file</code></td><td>作成・変更</td><td>既存ファイルを指定フォルダへ複製。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>copy_folder</code></td><td>作成・変更</td><td>既存フォルダを指定の親へ複製。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>create_metadata_template</code></td><td>作成・変更</td><td>Enterprise向けメタデータテンプレートを作成。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>list_hubs</code></td><td>Hubs</td><td>Box認証ユーザーがアクセス可能なHubを列挙。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_hub_details</code></td><td>Hubs</td><td>Hubの属性、所有・管理情報、作成情報等を取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_hub_items</code></td><td>Hubs</td><td>Hubに登録されたファイル・フォルダ・Webリンクを取得。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>create_hub</code></td><td>Hubs</td><td>タイトル・説明を指定して新しいHubを作成。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>add_items_to_hub</code></td><td>Hubs</td><td>ファイル・フォルダ・WebリンクをHubへ追加。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>copy_hub</code></td><td>Hubs</td><td>既存Hubを複製。共有権限等によって含められる項目が変わる。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>ai_qa_hub</code></td><td>Box AI</td><td>Hub内のコンテンツを対象にBox AIへ質問。</td><td>AI処理</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>create_box_note</code></td><td>作成・変更</td><td>MarkdownからBox固有形式のBox Noteを作成。</td><td>書込</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_file_preview</code></td><td>コンテンツ参照</td><td>ファイルをチャット内で表示するプレビューを返す。描画可否はクライアント次第。</td><td>読取</td><td>定義確認・不許可</td></tr><tr data-search-row><td><code>get_preview_page</code></td><td>コンテンツ参照</td><td>直前のプレビュー文脈を使い、現在のページを画像として取得。クライアント対応が必要。</td><td>読取</td><td>定義確認・不許可</td></tr></tbody></table></div><p id="no-results" class="empty" hidden>一致するツールはありません。</p></details><p class="footnote">Box公式一覧は本検証の36定義より広い。管理者設定、接続、資格情報や更新時点で差があるため、36をBox MCPの固定総数とはしない。プレビューの表示、AI処理、書込、Hub等は未実行で、Copilot側の対応・ライセンス・scope・Boxコンテンツ権限の確認が必要。</p></section><section id="mcp-settings" aria-labelledby="mcp-settings-title"><div class="section-head"><span class="section-number">D</span><div><h2 id="mcp-settings-title">参考: 検証に使用したMCP Serverの設定情報（全体）</h2></div></div><p class="section-intro">標準MCP登録で作成し、Kong経由試験とEntra追加送信で使用した設定をまとめる。接続定義は保存済みの全体を収録し、抜粋ではない。Secret・トークン・秘密鍵は収録しない。Client IDは認証設定の項目を示し、配布用資料では値を非掲載とする。接続参照やcallbackは当該検証環境専用であり、別環境では再生成する。</p><div class="table-scroll"><table><thead><tr><th>UI設定項目</th><th>検証値・設定</th></tr></thead><tbody><tr><td>接続名</td><td>Box MCP OAuth Lab</td></tr><tr><td>Server URL</td><td>https://ca-box-mcp-lab-20261113.victoriouscoast-2da4e01b.japaneast.azurecontainerapps.io/box-mcp</td></tr><tr><td>認証</td><td>OAuth 2.0 / Manual / authorization code</td></tr><tr><td>Authorization URL</td><td>https://account.box.com/api/oauth2/authorize</td></tr><tr><td>Token / Refresh URL</td><td>https://api.box.com/oauth2/token</td></tr><tr><td>Scope</td><td>root_readonly</td></tr><tr><td>Client ID</td><td>検証専用Box OAuthアプリのID（配布用資料では値を非掲載）</td></tr><tr><td>Client Secret</td><td>同アプリのSecret（非掲載、値は接続へ保存済み）</td></tr><tr><td>Redirect / Callback URL</td><td>https://global.consent.azure-apim.net/redirect/cr261-5fbox-20mcp-20oauth-20lab-5f3632e724c270d875</td></tr><tr><td>接続の実行主体</td><td>Invoker（接続する利用者本人）</td></tr><tr><td>ツール許可</td><td>who_am_iのみ（検証したURL指定MCP接続の保存定義）</td></tr><tr><td>任意追加ヘッダー</td><td>entra-access-token = System.User.AccessToken（Entra拡張時のみ）</td></tr></tbody></table></div><div class="card"><h3>OpenAPI定義は、どの設定に必要か</h3><p><strong>標準MCPオンボーディングで基本接続を作る場合、利用者がOpenAPIを手書き・インポートすることは必須ではない。</strong>Server URLとOAuth等を標準画面へ入力して登録できる。Power PlatformはそのMCP接続をコネクタとして管理する。</p><p>付録D-1/D-2は、その接続先・認証・追加パラメータを保持するOpenAPI（Swagger 2.0）の保存定義。今回はHost/Base URLの中継先指定と、Entra追加ヘッダーentra-access-tokenの入力項目を確認・再現する根拠になる。Power Appsからコネクタを手動作成する経路ではOpenAPIをインポートする。既存MCPの接続定義や追加パラメータを編集する場合はPower Apps/Power AutomateのCustom connectorsを使用できる。</p><p>OpenAPIだけでEntraの実トークンが設定されるわけではない。D-2のheader入力定義に加え、D-3のTaskDialogでSystem.User.AccessTokenを割り当てる。Box OAuthのClient ID/Secret・callback設定と本人同意も別途必要。</p><p class="footnote"><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent">Microsoft公式：標準wizard、OpenAPIを使う手動作成、接続定義の編集</a>（2026/11/15確認）。</p></div><details class="card" open><summary>D-1 基本中継：OpenAPI定義（全体）</summary><pre><code>swagger: &#x27;2.0&#x27;
+info:
+  title: Box MCP OAuth Lab
+  description: &gt;-
+    Read-only custom OAuth baseline for Box MCP, followed by Kong pass-through
+    validation.
+  version: 1.0.0
+host: &gt;-
+  ca-box-mcp-lab-20261113.victoriouscoast-2da4e01b.japaneast.azurecontainerapps.io
+basePath: /box-mcp
+schemes:
+  - https
+paths:
+  /:
+    post:
+      responses:
+        &#x27;200&#x27;:
+          description: Immediate Response
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      operationId: InvokeServer
+      summary: Box MCP OAuth Lab
+      description: &gt;-
+        Read-only custom OAuth baseline for Box MCP, followed by Kong
+        pass-through validation.
+securityDefinitions:
+  oauth2-auth:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://account.box.com/api/oauth2/authorize
+    tokenUrl: https://api.box.com/oauth2/token
+    scopes:
+      root_readonly: root_readonly
+security:
+  - oauth2-auth:
+      - root_readonly
+</code></pre></details><details class="card" open><summary>D-2 Entra拡張後：OpenAPI定義（全体）</summary><pre><code>swagger: &#x27;2.0&#x27;
+info:
+  title: Box MCP OAuth Lab
+  description: &gt;-
+    Read-only custom OAuth baseline for Box MCP, followed by Kong pass-through
+    validation.
+  version: 1.0.0
+host: &gt;-
+  ca-box-mcp-lab-20261113.victoriouscoast-2da4e01b.japaneast.azurecontainerapps.io
+basePath: /box-mcp
+schemes:
+  - https
+paths:
+  /:
+    post:
+      responses:
+        &#x27;200&#x27;:
+          description: Immediate Response
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      operationId: InvokeServer
+      summary: Box MCP OAuth Lab
+      description: &gt;-
+        Read-only custom OAuth baseline for Box MCP, followed by Kong
+        pass-through validation.
+      parameters:
+        - name: entra-access-token
+          in: header
+          type: string
+          required: false
+          description: &gt;-
+            User access token for Kong identity validation; removed by Kong
+            before Box upstream
+securityDefinitions:
+  oauth2-auth:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: https://account.box.com/api/oauth2/authorize
+    tokenUrl: https://api.box.com/oauth2/token
+    scopes:
+      root_readonly: root_readonly
+security:
+  - oauth2-auth:
+      - root_readonly
+</code></pre></details><details class="card" open><summary>D-3 Entra参照を保存したMCPツール定義（全体）</summary><pre><code>kind: TaskDialog
+inputs:
+  - kind: ManualTaskInput
+    propertyName: &quot;&#x27;entra-access-token&#x27;&quot;
+    value: =System.User.AccessToken
+modelDisplayName: Box MCP OAuth Lab
+modelDescription: Read-only custom OAuth baseline for Box MCP, followed by Kong pass-through validation.
+action:
+  kind: InvokeExternalAgentTaskAction
+  connectionReference: cr261_boxMcpGatewayValidation.shared_cr261-5fbox-20mcp-20oauth-20lab-5f3632e724c270d875.b982e097e3034b27ba5348122cb44071
+  connectionProperties:
+    mode: Invoker
+  operationDetails:
+    kind: ModelContextProtocolMetadata
+    operationId: InvokeServer
+    tools:
+      kind: UseSpecificTools
+      tools:
+        - who_am_i
+</code></pre></details><div class="card"><h3>D-4 AI Gateway側のMCP Server設定</h3><p>type=passthrough-listener、enabled=true、upstream URL=https://mcp.box.com。route.paths=[/box-mcp]、protocols=[http,https]、strip_path=true、preserve_host=false、request_buffering=false、response_buffering=false。logging.payloads=false、logging.audits=true。ACA外部はHTTPS、コンテナへのhopは内部HTTP。</p><p>Entra拡張の診断ではPre-Functionで追加ヘッダーの形式を測定し、Box前に削除。署名検証用Auth StrategyやグループACLは未設定。これを将来追加する際は、認証→ACL→ヘッダー削除→Box転送へ実行順を変更する。</p></div></section></main><footer class="report-footer"><span>Box MCP検証 / Kong社内およびお客様（NDA必須）。他への共有不可</span><a href="#top">先頭へ戻る ↑</a><span>vault-report-light/v1</span></footer><script>/* vault-report-light/v1 — local interactions only */
+document.getElementById('print')?.addEventListener('click', () => window.print());
+const search = document.getElementById('detail-search');
+const rows = [...document.querySelectorAll('[data-search-row]')];
+function filterRows() {
+  const query = (search?.value || '').normalize('NFKC').toLocaleLowerCase().trim();
+  let count = 0;
+  rows.forEach(row => {
+    row.hidden = !row.textContent.normalize('NFKC').toLocaleLowerCase().includes(query);
+    if (!row.hidden) count++;
+  });
+  const status = document.getElementById('result-count');
+  if (status) status.textContent = `表示 ${count} / 全${rows.length}件`;
+  const empty = document.getElementById('no-results');
+  if (empty) empty.hidden = count !== 0;
+}
+search?.addEventListener('input', filterRows);
+filterRows();
+let printState = null;
+window.addEventListener('beforeprint', () => {
+  if (printState) return;
+  printState = {
+    details: [...document.querySelectorAll('details')].map(el => [el, el.open]),
+    rows: rows.map(el => [el, el.hidden])
+  };
+  printState.details.forEach(([el]) => { el.open = true; });
+  rows.forEach(el => { el.hidden = false; });
+});
+window.addEventListener('afterprint', () => {
+  if (!printState) return;
+  printState.details.forEach(([el, open]) => { el.open = open; });
+  printState.rows.forEach(([el, hidden]) => { el.hidden = hidden; });
+  printState = null;
+});
+</script></body></html>
