@@ -78,8 +78,8 @@
     <details class="card compact"><summary>登録間の差と確認点</summary><p>Primary欄とTeam Member Primaryの両方を照合します。今回の表示で登録を自動的に修正したり、担当の優先順位を変えたりはしていません。</p><div id="assignment-differences" class="table-scroll"></div></details>
   </section>
   <section id="workload" aria-labelledby="workload-title">
-    <div class="section-head"><span class="section-number">06</span><div><p class="eyebrow">見えている需要と、まだ見えていない仕事</p><h2 id="workload-title">負荷の推移と3週予測</h2></div><span class="scope-chip">会議・通常準備等の既知小計</span></div>
-    <div class="card"><div class="card-head"><h3>過去から、向こう3週へ</h3><p>全SE共通の時間軸・Y軸</p></div><div class="legend" id="se-legend"></div><div id="workload-chart" class="chart-scroll"></div><p class="footnote">実線は後日再構成した過去の部分推計、破線と背景色の部分は保存予定による予測です。過去と予測の線は接続していません。実績タイムシートや、全業務の需要ではありません。</p></div>
+    <div class="section-head"><span class="section-number">06</span><div><p class="eyebrow">見えている需要と、まだ見えていない仕事</p><h2 id="workload-title">負荷の推移と3週予測</h2></div><span class="scope-chip" id="workload-scope">会議・通常準備等の既知小計</span></div>
+    <div class="card"><div class="card-head"><h3>過去から、向こう3週へ</h3><p>全SE共通の時間軸・Y軸</p></div><div class="legend" id="se-legend"></div><div id="workload-chart" class="chart-scroll"></div><p class="footnote" id="workload-chart-note">実線は後日再構成した過去の部分推計、破線と背景色の部分は保存予定による予測です。過去と予測の線は接続していません。実績タイムシートや、全業務の需要ではありません。</p></div>
     <div class="card"><div class="card-head"><h3 id="forecast-label">今週を含む3週の既知推計</h3><p id="forecast-clock"></p></div><div id="forecast-table" class="table-scroll"></div><p class="footnote">参考比率＝既知推定h÷暫定容量40h×100。会社休業・個人休暇を確認済みの実容量ではありません。100%超も保持します。後半週の低い値を、余力の証明に使わないでください。</p></div>
     <div class="card" id="operational-load-card" hidden><div class="card-head"><h3>会議外作業と暫定PoC支援枠</h3></div><div id="operational-load-table" class="table-scroll"></div><p id="operational-load-limits" class="footnote"></p></div>
     <div class="explanation"><div><span class="label-pill">hと%の関係</span><h3>同じ仕事を、時間と割合で見る</h3><p id="ratio-example"></p></div><div><span class="label-pill">総計が未確定の理由</span><h3>未推計の仕事を0hにしない</h3><p>PoCの実開始・支援担当・当週の必要量、Q&Aの現在残量、未確定の予定などが残っています。既知小計は出せますが、全業務の総時間と稼働率はまだ確定できません。</p></div></div>
@@ -267,7 +267,11 @@ function renderWorkload(){
  $('workload-chart').innerHTML=svg(w,h,b,`過去${hw.length}週の部分推計と今週を含む3週間の予定需要、全SE共通軸`);
  $('se-legend').innerHTML=d.people.map(p=>`<span><i style="background:${p.color}"></i>${esc(p.name)}</span>`).join('')+'<span>実線：過去 ／ 破線：予測</span>';
  $('forecast-clock').textContent=`Calendar ${a.calendar_as_of}保存分`+(d.operational_work?.plans?.length?' ＋ 開始予定に基づく暫定PoC枠':'');
- if(d.operational_work?.plans?.length)$('forecast-label').textContent='今週を含む3週の部分需要計画（暫定PoC枠を含む）';
+ if(d.operational_work?.plans?.length){
+  $('forecast-label').textContent='今週を含む3週の部分需要計画（暫定PoC枠を含む）';
+  $('workload-scope').textContent='会議既知分＋暫定PoC計画';
+  $('workload-chart-note').textContent='実線は過去の部分推計、破線は会議・準備の既知分に開始予定のPoC支援を仮置きした部分計画です。実績や全需要ではなく、QA・質問票の残量と稼働率は未確定です。';
+ }
  const forecastRows=d.people.map(p=>[esc(p.name),...fw.map(week=>{const r=a.forecast.find(r=>r.se===p.name&&r.week===week);const pct=r.capacity>0?r.hours/r.capacity*100:null;return `<strong>${fmt(r.hours)}h</strong>${r.provisional_additional_hours?`<br><span class="data-note">会議等 ${fmt(r.calendar_hours)}h ＋ 暫定PoC ${fmt(r.provisional_additional_hours)}h</span>`:''}<br><span class="${pct>100?'pos-over':'data-note'}">${pct===null?'比率未確定':pct.toFixed(1)+'%'}</span>`;}),`<strong>${fmt(a.forecast.filter(r=>r.se===p.name).reduce((s,r)=>s+r.hours,0))}h</strong>`]);
  $('forecast-table').innerHTML=table(['SE',...fw.map(w=>shortDate(w)+'週：h / 参考比率'),'3週計'],forecastRows);
  const example=a.forecast.reduce((best,r)=>r.hours>best.hours?r:best,a.forecast[0]);$('ratio-example').textContent=example.capacity>0?`たとえば${fmt(example.hours)}hは${d.operational_work?.plans?.length?'会議等と暫定PoC支援枠の部分需要計画':'既知の時間小計'}です。暫定${fmt(example.capacity)}hで割ると${(example.hours/example.capacity*100).toFixed(1)}%。同じ仕事を割合で表した参考値であり、新たな工数を加えた値ではありません。全業務の総時間・稼働率は未確定のままです。`:`${fmt(example.hours)}hは既知の時間小計です。容量が未確認のため、割合は未確定です。`;
