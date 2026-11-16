@@ -145,32 +145,16 @@ function pause(){current()?.cancel();paused=true;$('#pause-screen').hidden=false
 function resume(){paused=false;$('#pause-screen').hidden=true;$('#next').focus();}
 function openDialog(dialog){current()?.cancel();lastFocus=document.activeElement;dialog.showModal();}
 function closeDialog(dialog){dialog.close();lastFocus?.focus();}
-async function exitFullscreen(){
-  try { await document.exitFullscreen(); }
-  catch { $('#status').textContent='全画面を解除できませんでした。Fキーで再度お試しください'; }
-}
-async function fullscreen(){try{if(document.fullscreenElement)await exitFullscreen();else await document.documentElement.requestFullscreen();}catch{$('#status').textContent='全画面はブラウザのメニューから選択してください';}}
-// Handle presentation shortcuts at the window capture phase, before focused controls.
-window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&document.fullscreenElement){
-    e.preventDefault();e.stopImmediatePropagation();void exitFullscreen();return;
-  }
-  const controlOne=e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&
-    (e.code==='Digit1'||e.code==='Numpad1'||e.key==='1');
-  const editing=e.composedPath().some(node=>node.isContentEditable||node.matches?.('input,textarea,select'));
-  const plainH=!e.ctrlKey&&!e.altKey&&!e.metaKey&&!editing&&e.key.toLowerCase()==='h';
-  if(!controlOne&&!plainH)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  if(!e.repeat){setControlsHidden(!controlsHidden);$('#live').textContent=controlsHidden?'コントロールバーを非表示':'コントロールバーを表示';}
-},true);
-document.addEventListener('fullscreenchange',()=>{
-  resize();
-  if(!menu.open&&!help.open&&!paused){$('#viewport').tabIndex=-1;$('#viewport').focus({preventScroll:true});}
-});
+async function fullscreen(){try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{$('#status').textContent='全画面はブラウザのメニューから選択してください';}}
 $('#next').onclick=next;$('#previous').onclick=previous;$('#replay').onclick=()=>current()?.replay();$('#menu-button').onclick=()=>openDialog(menu);$('#help-button').onclick=()=>openDialog(help);$('#pause-button').onclick=pause;$('#resume').onclick=resume;$('#fullscreen').onclick=fullscreen;
 select.onchange=()=>current()?.jump(+select.value);
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.closest('dialog')));
 document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&(e.code==='Digit1'||e.key==='1')){
+    e.preventDefault();
+    if(!e.repeat){setControlsHidden(!controlsHidden);$('#live').textContent=controlsHidden?'コントロールバーを非表示':'コントロールバーを表示';}
+    return;
+  }
   if(e.altKey||e.ctrlKey||e.metaKey)return;
   if(paused){if(['b','B','Escape'].includes(e.key)){e.preventDefault();resume();}return;}
   if(menu.open||help.open||e.target.closest('select,input,textarea')||([' ','Enter'].includes(e.key)&&e.target.closest('button,a')))return;
@@ -195,4 +179,4 @@ const [hashId,hashStep]=location.hash.slice(1).split('/');
 const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
 go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final06'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final07'};
