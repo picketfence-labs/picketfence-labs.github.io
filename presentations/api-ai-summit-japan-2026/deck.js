@@ -9,7 +9,7 @@ const $ = s => document.querySelector(s);
 const slides = [...document.querySelectorAll('.slide')];
 const components = new Map();
 const menu = $('#menu'), help = $('#help'), select = $('#step-select');
-const storageKey = 'api-ai-summit-2026-final02';
+const storageKey = 'api-ai-summit-2026-final03';
 let page = 0, paused = false, flip = null, lastFocus = null;
 let saved = {};
 try { saved = JSON.parse(sessionStorage.getItem(storageKey) || '{}'); } catch {}
@@ -21,6 +21,8 @@ function withEmptyStart(slide, component) {
   let empty = true;
   const shadow = slide.querySelector('#connectivity-host,#gateway-host,#p1-host')?.shadowRoot;
   const root = shadow || slide;
+  // Keep the embedded SVG in its own layer so visibility changes repaint its headings.
+  if (slide.dataset.component === 'p1') root.querySelector('svg').style.transform = 'translateZ(0)';
   const selectors = {
     connectivity: '.c-canvas > :not(.c-title):not(.c-sentence):not(.c-guide)',
     connectivityValue: '.v-canvas > :not(h2):not(.v-sentence):not(.v-guide)',
@@ -154,4 +156,4 @@ const [hashId,hashStep]=location.hash.slice(1).split('/');
 const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
 go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final02'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final03'};
