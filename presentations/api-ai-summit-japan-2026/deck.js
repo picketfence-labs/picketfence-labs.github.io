@@ -9,12 +9,38 @@ const $ = s => document.querySelector(s);
 const slides = [...document.querySelectorAll('.slide')];
 const components = new Map();
 const menu = $('#menu'), help = $('#help'), select = $('#step-select');
-const storageKey = 'api-ai-summit-2026-draft01';
+const storageKey = 'api-ai-summit-2026-final01';
 let page = 0, paused = false, flip = null, lastFocus = null;
 let saved = {};
 try { saved = JSON.parse(sessionStorage.getItem(storageKey) || '{}'); } catch {}
 function resize() { const v = $('#viewport'); document.documentElement.style.setProperty('--scale', Math.min(v.clientWidth/1600,v.clientHeight/900)); }
 window.addEventListener('resize',resize); resize();
+
+// Adapt existing animations without changing their internal state numbers.
+function withEmptyStart(slide, component) {
+  let empty = true;
+  const states = ['開始前 · クリックで表示', ...(component?.states || [slide.dataset.title])];
+  function show() { empty = false; slide.classList.remove('awaiting-first-click'); update(); }
+  function jump(target) {
+    const index = Math.max(0, Math.min(states.length - 1, Number(target) || 0));
+    empty = index === 0;
+    component?.jump(Math.max(0, index - 1));
+    slide.classList.toggle('awaiting-first-click', empty);
+  }
+  slide.classList.add('awaiting-first-click');
+  return {
+    states,
+    getState() {
+      const s = component?.getState() || {step: 0, busy: false};
+      return {...s, step: empty ? 0 : s.step + 1, count: states.length, title: empty ? states[0] : states[s.step + 1]};
+    },
+    next() { if (empty) { show(); return true; } return component?.next() || false; },
+    previous() { if (empty) return false; if (!component || component.getState().step === 0) { jump(0); update(); return true; } return component.previous(); },
+    replay() { if (empty) show(); else component?.replay(); },
+    jump,
+    cancel() { component?.cancel(); }
+  };
+}
 
 for (const [i, slide] of slides.entries()) {
   slide.setAttribute('aria-label',`${i+1}. ${slide.dataset.title}`);
@@ -38,6 +64,7 @@ for (const [i, slide] of slides.entries()) {
     }
     components.set(i,mountSequence(slide,sequences[slide.dataset.component],()=>queueMicrotask(update)));
   }
+  components.set(i, withEmptyStart(slide, components.get(i)));
   const button=document.createElement('button');button.innerHTML=`<span>${String(i+1).padStart(2,'0')}</span>`;button.append(document.createTextNode(slide.dataset.title));button.dataset.page=i;
   button.onclick=()=>{closeDialog(menu);go(i);};$('#slide-menu').append(button);
 }
@@ -65,8 +92,7 @@ function go(target, step, animate=true) {
   current()?.cancel();persist();
   const previous=page;flip?.cancel();page=target;
   slides.forEach((slide,i)=>{slide.classList.toggle('active',i===page);slide.inert=i!==page;slide.setAttribute('aria-hidden',String(i!==page));});
-  if(step!==undefined)current()?.jump(step);
-  else if(saved.steps?.[slides[page].id]!==undefined)current()?.jump(saved.steps[slides[page].id]);
+  current()?.jump(step ?? 0);
   if(animate&&previous!==page&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
     const sign=page>previous?1:-1;
     flip=slides[page].animate([{transform:`translateY(${sign*130}px) rotateX(${-sign*8}deg)`,opacity:.15},{transform:'translateY(0) rotateX(0)',opacity:1}],{duration:420,easing:'cubic-bezier(.2,.7,.2,1)'});
@@ -97,6 +123,7 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='?')openDialog(help);
 });
 let wheelLast=0,wheelTotal=0,wheelUsed=false;
+$('#viewport').addEventListener('click',e=>{if(menu.open||help.open||paused||e.composedPath().some(node=>node.matches?.('a,button,input,select,textarea')))return;next();});
 $('#viewport').addEventListener('wheel',e=>{e.preventDefault();if(menu.open||help.open||paused)return;const now=performance.now();if(now-wheelLast>240){wheelTotal=0;wheelUsed=false;}wheelLast=now;wheelTotal+=e.deltaY*(e.deltaMode===1?16:1);if(!wheelUsed&&Math.abs(wheelTotal)>=65){wheelUsed=true;wheelTotal>0?next():previous();}},{passive:false});
 let touch=null;$('#viewport').addEventListener('touchstart',e=>{if(e.touches.length===1)touch=[e.touches[0].clientX,e.touches[0].clientY];},{passive:true});
 $('#viewport').addEventListener('touchend',e=>{if(!touch)return;const t=e.changedTouches[0],dy=touch[1]-t.clientY,dx=touch[0]-t.clientX;touch=null;if(Math.abs(dy)>60&&Math.abs(dy)>Math.abs(dx))dy>0?next():previous();},{passive:true});
@@ -104,8 +131,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)current()?.
 window.addEventListener('blur',()=>current()?.cancel());
 window.addEventListener('hashchange',()=>{const [id,s]=location.hash.slice(1).split('/');const n=slides.findIndex(x=>x.id===id);if(n>=0)go(n,Number.isFinite(+s)?+s:0);});
 const [hashId,hashStep]=location.hash.slice(1).split('/');
-const initialId=hashId||saved.page||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
+const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
 const initialSteps={...saved.steps};
-go(initial<0?0:initial,hashId?Number(hashStep)||0:initialSteps[initialId]||0,false);
+go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'draft-02'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final01'};

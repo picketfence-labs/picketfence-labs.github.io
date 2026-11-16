@@ -174,3 +174,6 @@
 .connectivity-value-slide.v2-initializing .v2-project,.connectivity-value-slide.v2-initializing .v2-target,.connectivity-value-slide.v2-initializing .v2-fragment,.connectivity-value-slide.v2-initializing .v2-plane,.connectivity-value-slide.v2-initializing .v2-lane,.connectivity-value-slide.v2-initializing .v2-govern,.connectivity-value-slide.v2-initializing .v2-konnect,.connectivity-value-slide.v2-initializing .v2-routes{transition:none}
 @media(prefers-reduced-motion:reduce){.v2-project,.v2-target,.v2-fragment,.v2-plane,.v2-lane,.v2-govern,.v2-konnect,.v2-routes{transition:none}}
 
+
+/* Keep each page empty until its first advance; retain only its background and footer. */
+.slide.awaiting-first-click > :not(.footer-logo):not(.page-number):not(.pattern):not(.cover-pattern){visibility:hidden!important;pointer-events:none!important}
