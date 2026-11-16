@@ -177,3 +177,6 @@
 
 /* Only the animated diagram content is blank before the first advance. */
 .animation-pending{visibility:hidden!important;pointer-events:none!important}
+
+/* Reclaim the toolbar space while presentation controls are hidden. */
+body.controls-hidden #viewport{bottom:0}

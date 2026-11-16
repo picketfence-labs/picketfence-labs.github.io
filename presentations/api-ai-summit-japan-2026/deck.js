@@ -16,6 +16,24 @@ try { saved = JSON.parse(sessionStorage.getItem(storageKey) || '{}'); } catch {}
 function resize() { const v = $('#viewport'); document.documentElement.style.setProperty('--scale', Math.min(v.clientWidth/1600,v.clientHeight/900)); }
 window.addEventListener('resize',resize); resize();
 
+const controlsStorageKey = 'api-ai-summit-2026-controls-hidden';
+let controlsHidden = false;
+try { controlsHidden = sessionStorage.getItem(controlsStorageKey) === 'true'; } catch {}
+function setControlsHidden(hidden) {
+  controlsHidden = hidden;
+  const toolbar = $('#toolbar');
+  if (hidden && toolbar.contains(document.activeElement)) {
+    $('#viewport').tabIndex = -1;
+    $('#viewport').focus({preventScroll:true});
+  }
+  toolbar.hidden = hidden;
+  $('#progress').hidden = hidden;
+  document.body.classList.toggle('controls-hidden', hidden);
+  try { sessionStorage.setItem(controlsStorageKey, String(hidden)); } catch {}
+  resize();
+}
+setControlsHidden(controlsHidden);
+
 // Only diagram content starts empty; headings and non-animated pages stay visible.
 function withEmptyStart(slide, component) {
   let empty = true;
@@ -132,6 +150,11 @@ $('#next').onclick=next;$('#previous').onclick=previous;$('#replay').onclick=()=
 select.onchange=()=>current()?.jump(+select.value);
 document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeDialog(b.closest('dialog')));
 document.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&!e.altKey&&!e.metaKey&&!e.shiftKey&&(e.code==='Digit1'||e.key==='1')){
+    e.preventDefault();
+    if(!e.repeat){setControlsHidden(!controlsHidden);$('#live').textContent=controlsHidden?'コントロールバーを非表示':'コントロールバーを表示';}
+    return;
+  }
   if(e.altKey||e.ctrlKey||e.metaKey)return;
   if(paused){if(['b','B','Escape'].includes(e.key)){e.preventDefault();resume();}return;}
   if(menu.open||help.open||e.target.closest('select,input,textarea')||([' ','Enter'].includes(e.key)&&e.target.closest('button,a')))return;
@@ -156,4 +179,4 @@ const [hashId,hashStep]=location.hash.slice(1).split('/');
 const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
 go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final03'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final04'};
