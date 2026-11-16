@@ -9,25 +9,45 @@ const $ = s => document.querySelector(s);
 const slides = [...document.querySelectorAll('.slide')];
 const components = new Map();
 const menu = $('#menu'), help = $('#help'), select = $('#step-select');
-const storageKey = 'api-ai-summit-2026-final01';
+const storageKey = 'api-ai-summit-2026-final02';
 let page = 0, paused = false, flip = null, lastFocus = null;
 let saved = {};
 try { saved = JSON.parse(sessionStorage.getItem(storageKey) || '{}'); } catch {}
 function resize() { const v = $('#viewport'); document.documentElement.style.setProperty('--scale', Math.min(v.clientWidth/1600,v.clientHeight/900)); }
 window.addEventListener('resize',resize); resize();
 
-// Adapt existing animations without changing their internal state numbers.
+// Only diagram content starts empty; headings and non-animated pages stay visible.
 function withEmptyStart(slide, component) {
   let empty = true;
+  const shadow = slide.querySelector('#connectivity-host,#gateway-host,#p1-host')?.shadowRoot;
+  const root = shadow || slide;
+  const selectors = {
+    connectivity: '.c-canvas > :not(.c-title):not(.c-sentence):not(.c-guide)',
+    connectivityValue: '.v-canvas > :not(h2):not(.v-sentence):not(.v-guide)',
+    gateway: '.g-canvas > :not(.g-title):not(.g-sentence):not(.g-guide)',
+    p1: 'svg > :not(title):not(defs):not(.bg):not(.guide):not(.scene-title):not(.sentence)',
+    code: '.diagram,.scene-caption',
+    architecture: '.diagram,.scene-caption'
+  };
+  const parts = [...root.querySelectorAll(selectors[slide.dataset.component])];
+  if (shadow) {
+    const style = document.createElement('style');
+    style.textContent = '.animation-pending{visibility:hidden!important;pointer-events:none!important}';
+    shadow.append(style);
+  }
+  function setEmpty(value) {
+    empty = value;
+    slide.classList.toggle('awaiting-first-click', empty);
+    parts.forEach(part => part.classList.toggle('animation-pending', empty));
+  }
   const states = ['開始前 · クリックで表示', ...(component?.states || [slide.dataset.title])];
-  function show() { empty = false; slide.classList.remove('awaiting-first-click'); update(); }
+  function show() { setEmpty(false); update(); }
   function jump(target) {
     const index = Math.max(0, Math.min(states.length - 1, Number(target) || 0));
-    empty = index === 0;
-    component?.jump(Math.max(0, index - 1));
-    slide.classList.toggle('awaiting-first-click', empty);
+    component.jump(Math.max(0, index - 1));
+    setEmpty(index === 0);
   }
-  slide.classList.add('awaiting-first-click');
+  setEmpty(true);
   return {
     states,
     getState() {
@@ -64,7 +84,7 @@ for (const [i, slide] of slides.entries()) {
     }
     components.set(i,mountSequence(slide,sequences[slide.dataset.component],()=>queueMicrotask(update)));
   }
-  components.set(i, withEmptyStart(slide, components.get(i)));
+  if (components.has(i)) components.set(i, withEmptyStart(slide, components.get(i)));
   const button=document.createElement('button');button.innerHTML=`<span>${String(i+1).padStart(2,'0')}</span>`;button.append(document.createTextNode(slide.dataset.title));button.dataset.page=i;
   button.onclick=()=>{closeDialog(menu);go(i);};$('#slide-menu').append(button);
 }
@@ -132,7 +152,6 @@ window.addEventListener('blur',()=>current()?.cancel());
 window.addEventListener('hashchange',()=>{const [id,s]=location.hash.slice(1).split('/');const n=slides.findIndex(x=>x.id===id);if(n>=0)go(n,Number.isFinite(+s)?+s:0);});
 const [hashId,hashStep]=location.hash.slice(1).split('/');
 const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
-const initialSteps={...saved.steps};
 go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final01'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final02'};
