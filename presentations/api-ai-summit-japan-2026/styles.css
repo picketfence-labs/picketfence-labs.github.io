@@ -180,3 +180,5 @@
 
 /* Reclaim the toolbar space while presentation controls are hidden. */
 body.controls-hidden #viewport{bottom:0}
+
+#viewport:focus{outline:none}
