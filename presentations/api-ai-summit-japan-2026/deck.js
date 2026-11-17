@@ -1,8 +1,8 @@
-import {mountP1} from './components/p1.js';
+import {mountP1} from './components/p1.js?v=20261117-final08';
 import {mountSequence, sequences} from './components/sequence.js?v=20261102-p14e';
 import {mountConnectivity} from './components/connectivity.js';
 import {mountConnectivityValue} from './components/connectivity-value.js?v=20261102-p4b';
-import {mountGateway} from './components/gateway.js';
+import {mountGateway} from './components/gateway.js?v=20261117-final08';
 import {mountContextCode} from './components/context-code.js';
 
 const $ = s => document.querySelector(s);
@@ -119,9 +119,9 @@ function update() {
   const s=state();$('#position').textContent=`${String(page+1).padStart(2,'0')} / ${slides.length}`;
   select.hidden=s.count===1;$('#replay').hidden=s.count===1;
   if(s.count>1){if(select.dataset.page!==String(page)){select.replaceChildren(...current().states.map((title,i)=>new Option(`${i+1} / ${s.count}　${title}`,i)));select.dataset.page=String(page);}select.value=String(s.step);}
-  $('#previous').disabled=page===0&&s.step===0;$('#next').disabled=s.busy||page===slides.length-1&&s.step===s.count-1;
-  $('#next').textContent=s.step<s.count-1?'次の状態 ↓':'次ページ ↓';$('#replay').disabled=s.busy||s.step===0;
-  $('#status').textContent=s.busy?'動作中 · 戻る／一覧で中断可':s.count>1?`${s.step+1}/${s.count} · ${s.title}`:slides[page].dataset.title;
+  $('#previous').disabled=page===0&&s.step===0;$('#next').disabled=s.busy||page===slides.length-1&&s.step===s.count-1&&!s.pending;
+  $('#next').textContent=s.pending?'再生 ↓':s.step<s.count-1?'次の状態 ↓':'次ページ ↓';$('#replay').disabled=s.busy||s.step===0;
+  $('#status').textContent=s.busy?'動作中 · 戻る／一覧で中断可':s.pending?`${s.step+1}/${s.count} · 次の操作でアニメーション開始`:s.count>1?`${s.step+1}/${s.count} · ${s.title}`:slides[page].dataset.title;
   $('#progress').style.width=`${(page+1)/slides.length*100}%`;
   document.querySelectorAll('#slide-menu button').forEach(b=>b.setAttribute('aria-current',String(+b.dataset.page===page)));
   $('#stage').dataset.page=slides[page].id;$('#stage').dataset.step=s.step;$('#stage').dataset.busy=String(s.busy);
@@ -139,7 +139,7 @@ function go(target, step, animate=true) {
   }
   update();$('#live').textContent=`${page+1}ページ。${slides[page].dataset.title}`;
 }
-function next(){if(paused||state().busy||flip?.playState==='running')return;const s=state();if(s.step<s.count-1)current().next();else go(page+1);}
+function next(){if(paused||state().busy||flip?.playState==='running')return;const s=state();if(s.pending||s.step<s.count-1)current().next();else go(page+1);}
 function previous(){if(paused)return;if(state().step>0)current().previous();else go(page-1);}
 function pause(){current()?.cancel();paused=true;$('#pause-screen').hidden=false;$('#resume').focus();persist();}
 function resume(){paused=false;$('#pause-screen').hidden=true;$('#next').focus();}
@@ -179,4 +179,4 @@ const [hashId,hashStep]=location.hash.slice(1).split('/');
 const initialId=hashId||slides[0].id;const initial=slides.findIndex(x=>x.id===initialId);
 go(initial<0?0:initial,hashId?Number(hashStep)||0:0,false);
 // Read-only inspection for validation; controls use the same public UI handlers.
-window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261116-final07'};
+window.summit={getState:()=>({page:slides[page].id,...state(),paused}),version:'20261117-final08'};

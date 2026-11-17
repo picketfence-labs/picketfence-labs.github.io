@@ -38,10 +38,11 @@ export function mountGateway(slide, onChange = () => {}) {
     agent:Object.fromEntries(['x','y','w','h'].map(k=>[k,a.agent[k]+(b.agent[k]-a.agent[k])*t])),
     modelFont:a.modelFont+(b.modelFont-a.modelFont)*t,nodeFont:a.nodeFont+(b.nodeFont-a.nodeFont)*t
   });
-  let step=0,busy=false,generation=0,frame=null,settle=null;
+  let step=0,busy=false,pending=false,generation=0,frame=null,settle=null;
+  const deferredSteps=new Set([3,4]);
   const packet=$('g-packet');
   const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const snapshot=()=>({step,busy,count:states.length,title:states[step][0]});
+  const snapshot=()=>({step,busy,pending,count:states.length,title:states[step][0]});
   const visible=(id,on)=>$(id).classList.toggle('g-visible',on);
   function applyLayout(layout){
     const place=(id,r)=>{const e=$(id);e.style.left=r.x+'px';e.style.top=r.y+'px';e.style.width=r.w+'px';e.style.height=r.h+'px'};
@@ -88,6 +89,12 @@ export function mountGateway(slide, onChange = () => {}) {
     activeModel([null,0,1,1,null][step]);
     if(step>0)$('g-route-agent').classList.add('g-hot');
     if(step===2){$('g-model-0').classList.add('g-error');$('g-route-0').classList.add('g-failed')}
+    if(pending){
+      activeModel(null);$('g-route-agent').classList.remove('g-hot');
+      $('g-gateway-state').textContent='入力を検査';
+      if(step===3)visible('g-received',false);
+      if(step===4)visible('g-block',false);
+    }
     slide.dataset.step=String(step);slide.dataset.busy=String(busy);onChange(snapshot());
   }
   function animate(duration,token,paint){
@@ -117,19 +124,27 @@ export function mountGateway(slide, onChange = () => {}) {
   }
   async function pause(ms,token){return animate(ms,token,()=>{})}
   function cancel(){
-    generation++;if(frame!==null)cancelAnimationFrame(frame);frame=null;
-    if(settle){settle(false);settle=null}busy=false;render();
+    const interrupted=busy;generation++;if(frame!==null)cancelAnimationFrame(frame);frame=null;
+    if(settle){settle(false);settle=null}busy=false;
+    if(interrupted&&deferredSteps.has(step))pending=true;
+    render();
   }
-  function jump(target){cancel();step=Math.max(0,Math.min(states.length-1,target));render()}
+  function jump(target){cancel();step=Math.max(0,Math.min(states.length-1,target));pending=deferredSteps.has(step);render()}
   async function play(replay=false){
-    if(busy||(!replay&&step===states.length-1)||(replay&&step===0))return false;
-    if(replay){step--;render()}
-    const from=layoutFor(step);step++;const token=++generation;busy=true;render();
+    if(busy||(!replay&&!pending&&step===states.length-1)||(replay&&step===0))return false;
+    let from=layoutFor(step);
+    if(replay&&!deferredSteps.has(step)){step--;render();from=layoutFor(step);step++}
+    else if(!replay&&!pending){
+      step++;
+      if(deferredSteps.has(step)){pending=true;render();return true}
+    }
+    pending=false;
+    const token=++generation;busy=true;render();
     if(reduced()){busy=false;render();return true}
     if(step===1)$('g-gateway-state').textContent='選択先: OpenAI Sol';
     if(step===3){visible('g-received',false);$('g-gateway-state').textContent='入力を検査'}
     activeModel(null);let ok=true;
-    if(step===1||step===3){
+    if((step===1||step===3)&&from!==layoutFor(step)){
       const to=layoutFor(step);applyLayout(from);
       ok=await animate(720,token,t=>applyLayout(interpolate(from,to,t)));
     }

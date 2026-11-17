@@ -43,7 +43,7 @@ export function mountP1(host, onChange = () => {}) {
   ];
   const toolNames=['顧客検索','顧客詳細','契約一覧','契約更新','利用履歴','利用集計','請求一覧','拠点検索','在庫照会','申請登録','履歴検索','案件一覧'];
   const $=s=>root.querySelector(s),app=$('#app'),canvas=$('#canvas'),selector=$('#state');
-  let index=0,busy=false,generation=0,current;
+  let index=0,busy=false,pending=false,generation=0,current;
   const state=i=>{
     const c=codes[i],intro=c<2,focus=[9,10.1,10.2,12].includes(c),processing=c===10.1||c===10.2;
     return {
@@ -56,6 +56,7 @@ export function mountP1(host, onChange = () => {}) {
       listed:c>=4?3:0,context:c===12?1:0,reshape:c===12?1:0,bloat:c===12?1:0,load:c===12?1:0,work:c===12?1:0,impacts:c===12?4:processing?2:0,selectionComplete:c===11.1?1:0,
     };
   };
+  const preparedState=i=>({...state(i),reshape:.5,bloat:0,load:0,work:0,impacts:0});
   function makeScene(){
     const svg=document.createElementNS(NS,'svg');svg.setAttribute('viewBox','0 0 1400 760');svg.setAttribute('role','img');
     svg.innerHTML=`<title></title><rect width="1400" height="760" class="bg"/>
@@ -230,15 +231,25 @@ export function mountP1(host, onChange = () => {}) {
   function update(){
     app.dataset.step=ids[index];app.dataset.code=String(codes[index]).padStart(2,'0');app.dataset.busy=String(busy);selector.value=String(index);
     $('#position').textContent=`P1 / ${app.dataset.code} · ${index+1}/${codes.length}`;
-    $('#prev').disabled=index===0;$('#next').disabled=index===codes.length-1||busy;$('#replay').disabled=index===0||busy;
-    $('#next').textContent=codes[index]===10.1?'結果を返す ↓':'次へ ↓';
-    $('#status').textContent=busy?'動作中 — 終了後に停止します':codes[index]===10.1?'結果を確認 — 次の操作で返却':index===codes.length-1?'P1の最終状態':'停止中 — 下矢印で次へ';$('#note').textContent=descriptions[index];
-    onChange({step:index,busy,count:codes.length,title:titles[index],code:codes[index]});
+    $('#prev').disabled=index===0;$('#next').disabled=(index===codes.length-1&&!pending)||busy;$('#replay').disabled=index===0||busy;
+    $('#next').textContent=pending?'再生 ↓':codes[index]===10.1?'結果を返す ↓':'次へ ↓';
+    $('#status').textContent=busy?'動作中 — 終了後に停止します':pending?'次の操作でアニメーション開始':codes[index]===10.1?'結果を確認 — 次の操作で返却':index===codes.length-1?'P1の最終状態':'停止中 — 下矢印で次へ';$('#note').textContent=descriptions[index];
+    onChange({step:index,busy,pending,count:codes.length,title:titles[index],code:codes[index]});
   }
-  function jump(i){generation++;busy=false;clean();index=Math.max(0,Math.min(codes.length-1,i));current=state(index);render(current);update();}
+  function jump(i){generation++;busy=false;clean();index=Math.max(0,Math.min(codes.length-1,i));pending=codes[index]===12;current=pending?preparedState(index):state(index);render(current);update();}
+  function cancel(){
+    const interrupted=busy;generation++;busy=false;clean();
+    if(interrupted&&codes[index]===12)pending=true;
+    current=pending?preparedState(index):state(index);render(current);update();
+  }
   async function advance(replay=false){
-    if(busy||!replay&&index===codes.length-1||replay&&index===0)return;
-    const from=replay?state(index-1):current;if(!replay)index++;
+    if(busy||!replay&&!pending&&index===codes.length-1||replay&&index===0)return;
+    const from=replay?(codes[index]===12?preparedState(index):state(index-1)):current;
+    if(!replay&&!pending){
+      index++;
+      if(codes[index]===12){pending=true;current=preparedState(index);clean();render(current);update();return;}
+    }
+    pending=false;
     const target=state(index),token=++generation,c=codes[index];busy=true;clean();update();
     const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches,visual={...target};
     if(!reduced){if(c===4){visual.tools=0;visual.listed=0;}if(c===7||c===8)visual.data=from.data;if(c===10.1){visual.ready=0;visual.opCount=0;}if(c===10.2)visual.result=0;if(c===11){visual.extra=0;visual.cloud=0;visual.tools=1;visual.data=3;}if(c===11.1){visual.extra=1;visual.cloud=0;visual.tools=0;visual.data=0;visual.selectionComplete=0;}if(c===12){visual.reshape=.5;visual.bloat=0;visual.load=0;visual.work=0;visual.impacts=0;}}
@@ -250,12 +261,12 @@ export function mountP1(host, onChange = () => {}) {
   titles.forEach((t,i)=>{const o=document.createElement('option');o.value=i;o.textContent=t;selector.append(o);});
   jump(0);
   return {
-    next(){if(busy)return false;if(index===codes.length-1)return false;advance();return true;},
+    next(){if(busy)return false;if(index===codes.length-1&&!pending)return false;advance();return true;},
     previous(){if(index===0)return false;jump(index-1);return true;},
     replay(){advance(true);},
     jump,
-    cancel(){jump(index);},
-    getState(){return {step:index,busy,count:codes.length,title:titles[index],code:codes[index]};},
+    cancel,
+    getState(){return {step:index,busy,pending,count:codes.length,title:titles[index],code:codes[index]};},
     states:titles
   };
 }
