@@ -26,7 +26,7 @@
 <a class="skip" href="#main">本文へ移動</a>
 <header class="masthead" id="top">
   <div class="headline"><div><h1>AI Gateway 2.xで組織内LLM APIをモデルとして管理する</h1><p class="deck">HTTPルートからAI Modelへの移行と上流APIキー管理</p></div><button class="print-button" id="print" type="button">印刷・PDF保存</button></div>
-  <div class="source-strip"><span>基準日 <strong>2026-11-24 JST</strong></span><span>対象 <strong>Hybrid DP 2.3.2</strong></span><span>版 <strong>v1.0</strong></span><span>共有範囲 <strong>公開用</strong></span></div>
+  <div class="source-strip"><span>基準日 <strong>2026-11-24 JST</strong></span><span>対象 <strong>Hybrid DP 2.3.2</strong></span><span>版 <strong>v1.1</strong></span><span>共有範囲 <strong>公開用</strong></span></div>
 </header>
 <nav class="navigation" aria-label="レポート内の移動"><a href="#overview">要点</a><a href="#paths">クライアントと経路</a><a href="#vault">キー管理</a><a href="#deployment">適用と検証</a><a href="#sources">出典</a></nav>
 <main id="main">
@@ -65,13 +65,13 @@
   </section>
   <section id="deployment" aria-labelledby="deployment-title">
     <div class="section-head"><span class="section-number">04</span><div><h2 id="deployment-title">移行と検証</h2></div></div>
-    <p class="section-intro" id="pilot-results">Flash-Liteの並行経路に7リソースを追加し、DPへの同期と再planの差分0件を確認した。クライアントは入口キーだけを送信。合成リクエスト1回でHTTP 200、入力5・出力2トークンを確認した。照会したCost Managementイベントに同じリクエストIDは見つからなかった。追加7モデルの構成は同じProviderとキーを共有する。</p>
+    <p class="section-intro" id="pilot-results">全8件をAI Modelとして追加し、共通ProviderとConfig Storeの参照、DP同期、再planの差分0件を確認した。8経路すべてで入口キーなしの要求は401。Flash-Liteは入口キーだけを送信した合成リクエスト1回でHTTP 200、入力5・出力2トークンを確認した。他7件は登録・同期・未認証拒否まで。照会したCost ManagementイベントにFlash-Liteと同じリクエストIDは見つからなかった。</p>
     <details class="card compact" open><summary>パイロットの状態と受入条件</summary>
       <ol>
         <li>Flash-Lite 1件を別パスのAI Modelとして構成し、既存HTTP Agentへの変更・削除がないことをplanで確認する。</li>
         <li>AI Model、Provider、Vaultの保存値とDP同期を読み戻す。無効な入口キー、許可外モデル、余分なパスの要求が上流に届かないことを確認する。</li>
         <li>推論の応答、必要なストリーム終端、使用量を確認する。Cost Managementの利用イベントと、上流側の費用計上は別々に照合する。</li>
-        <li>代表経路の受入後に残り7件へ展開し、呼び出し側を移行する。切り戻し用に既存HTTP AgentのURLを保持する。</li>
+        <li>代表経路の疎通後に残り7件を登録した。呼び出し側は検証済みの用途から新しいURLへ移行できる。切り戻し用に既存HTTP AgentのURLを保持する。</li>
       </ol>
     </details>
   </section>
