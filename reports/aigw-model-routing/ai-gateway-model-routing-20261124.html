@@ -21,12 +21,27 @@
 @media(max-width:650px){.controls input[type=search]{min-width:0;width:100%}.source-strip{overflow-wrap:anywhere}.folio{flex-wrap:wrap}.headline h1{overflow-wrap:anywhere}}
 @media print{.table-scroll table{min-width:0;table-layout:fixed}thead{display:table-header-group}tr{break-inside:avoid}#no-results{display:none!important}.card{break-inside:auto}h2,h3,summary{break-after:avoid}.navigation{position:static}}
 </style>
+<style>
+.vault-flows { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin:20px 0; }
+.vault-flows figure { margin:0; padding:16px; min-width:0; break-inside:avoid; }
+.vault-flows svg { display:block; width:100%; max-width:470px; height:auto; margin:0 auto; font-family:inherit; }
+.vault-flows figcaption { max-width:470px; margin:12px auto 0; font-size:.92rem; }
+.vault-flow-panel { fill:#e7ede5; stroke:#aeb5a7; }
+.vault-flow-box { fill:#fff; stroke:#aeb5a7; }
+.vault-flow-highlight { fill:#ccff00; stroke:#769004; }
+.vault-flow-title { fill:#263b2d; font-size:18px; font-weight:750; }
+.vault-flow-label { fill:#001408; font-size:15px; font-weight:700; }
+.vault-flow-detail { fill:#3f473e; font-size:12px; }
+.vault-flow-link { fill:none; stroke:#526353; stroke-width:1.6; }
+@media (max-width:740px) { .vault-flows { grid-template-columns:1fr; gap:12px; } .vault-flows figure { padding:12px; } }
+@media print { .vault-flows { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+</style>
 </head>
 <body>
 <a class="skip" href="#main">本文へ移動</a>
 <header class="masthead" id="top">
   <div class="headline"><div><h1>AI Gateway 2.xで組織内LLM APIをモデルとして管理する</h1><p class="deck">HTTPルートからAI Modelへの移行と上流APIキー管理</p></div><button class="print-button" id="print" type="button">印刷・PDF保存</button></div>
-  <div class="source-strip"><span>基準日 <strong>2026-11-24 JST</strong></span><span>対象 <strong>Hybrid DP 2.3.2</strong></span><span>版 <strong>v1.1</strong></span><span>共有範囲 <strong>公開用</strong></span></div>
+  <div class="source-strip"><span>基準日 <strong>2026-11-24 JST</strong></span><span>対象 <strong>Hybrid DP 2.3.2</strong></span><span>版 <strong>v1.2</strong></span><span>共有範囲 <strong>公開用</strong></span></div>
 </header>
 <nav class="navigation" aria-label="レポート内の移動"><a href="#overview">要点</a><a href="#paths">クライアントと経路</a><a href="#vault">キー管理</a><a href="#deployment">適用と検証</a><a href="#sources">出典</a></nav>
 <main id="main">
@@ -34,8 +49,8 @@
     <div class="section-head"><span class="section-number">01</span><div><h2 id="overview-title">なぜAgentsに表示されたか</h2></div></div>
     <p class="section-intro">最初の実装では、既存のChat Completions APIを固定URLに転送するHTTP型AI Agentを8件作成した。ルートごとにモデルと費用配賦用ヘッダーを固定し、上流APIキーはクライアントが送った。Konnectは設定されたエンティティの種類に従ってAgentsへ表示する。</p>
     <div class="focus-list">
-      <div class="focus-item"><strong>現行の通信</strong>Chat Completionsクライアント → HTTPSのHTTP Agent → 固定上流。合成入力1件でHTTP 200と使用量を確認済み。</div>
-      <div class="focus-item"><strong>移行する通信</strong>Chat Completionsクライアント → HTTPSのAI Model → AI Model Provider → 固定上流。Providerが保管済みのキーを付与する。Flash-Liteはこの経路でHTTP 200を確認し、Modelsへの登録も読み戻した。</div>
+      <div class="focus-item"><strong>旧経路</strong>Chat Completionsクライアント → HTTPSのHTTP Agent → 固定上流。パイロットでFlash-LiteのHTTP 200と使用量を確認した。</div>
+      <div class="focus-item"><strong>移行先の経路</strong>Chat Completionsクライアント → HTTPSのAI Model → AI Model Provider → 固定上流。Providerが保管済みの上流キーを付与する。8モデルすべてで合成リクエストのHTTP 200と使用量を確認した。</div>
     </div>
   </section>
   <section id="paths" aria-labelledby="paths-title">
@@ -44,7 +59,7 @@
       <caption>Gateway経由で使う場合のAPI契約</caption>
       <thead><tr><th scope="col">用途</th><th scope="col">API形式</th><th scope="col">入口と上流の認証</th><th scope="col">確認範囲</th></tr></thead>
       <tbody>
-        <tr><td>組織内LLM API</td><td>Chat Completions</td><td>Gatewayキーと上流APIキー</td><td>Chat Completionsを実装するSDK・アプリで利用可能。8経路の配信と拒否、代表1経路の推論を確認。</td></tr>
+        <tr><td>組織内LLM API</td><td>Chat Completions</td><td>Gatewayキーと上流APIキー</td><td>Chat Completionsを実装するSDK・アプリで利用可能。8経路の配信と未認証の拒否、全8モデルの推論を確認。</td></tr>
         <tr><td>CodexとChatGPT Pro</td><td>Responses</td><td>GatewayキーまたはOIDC。上流はChatGPTの購読ログイン</td><td>Gatewayキー経路はConsumer、OIDC経路はUser Principalに計測を帰属。対象版は計測用中継を使用。</td></tr>
         <tr><td>Claude Code Enterprise</td><td>Messages・Count Tokens</td><td>Gatewayキー。上流は既存Enterpriseのログイン</td><td>Opus・Sonnet・Haiku 5.5の計測ルートを登録済み。Haikuの推論は未確認。</td></tr>
       </tbody>
@@ -52,37 +67,81 @@
     <p>3経路とも推論に使うが、ツール呼び出し、ストリーム、モデル一覧、エラー処理は各APIの契約に従う。Chat CompletionsルートをAI Modelに変更しても、ResponsesやMessagesへの対応には対応フォーマットの実装と個別の検証が要る。</p>
   </section>
   <section id="vault" aria-labelledby="vault-title">
-    <div class="section-head"><span class="section-number">03</span><div><h2 id="vault-title">上流キーの保管と宣言</h2></div></div>
+    <div class="section-head"><span class="section-number">03</span><div><h2 id="vault-title">Config StoreとToken Vaultの使い分け</h2></div></div>
+    <p class="section-intro">今回の8モデルは、許可されたすべての呼び出しに同じ上流アプリキーを使う。利用者の権限はAI Gatewayの入口で判定し、出口では共通のProviderがConfig Storeのキーを参照する。キーの差し替えはStoreで行う。モデル定義と利用者のGatewayキーは継続して使える。</p>
+    <div class="vault-flows">
+      <figure class="card">
+        <svg viewBox="0 0 360 264" role="img" aria-labelledby="config-flow-title config-flow-desc">
+          <title id="config-flow-title">Config Storeで固定の上流キーを使う</title>
+          <desc id="config-flow-desc">AI Gatewayが入口キーとACLを検証する。AI Model ProviderがAI Vault参照から同じアプリキーを取得し、8モデルへの上流呼び出しに使う。</desc>
+          <rect class="vault-flow-panel" x="1" y="1" width="358" height="262" rx="9"/>
+          <text class="vault-flow-title" x="20" y="31">Config Store</text>
+          <rect class="vault-flow-box" x="20" y="49" width="320" height="47" rx="6"/>
+          <text class="vault-flow-label" x="34" y="69">AI Gatewayで入口を認証</text>
+          <text class="vault-flow-detail" x="34" y="86">GatewayキーとACLで呼び出しを許可</text>
+          <path class="vault-flow-link" d="M180 96v22m-5-5 5 5 5-5"/>
+          <rect class="vault-flow-highlight" x="20" y="120" width="320" height="53" rx="6"/>
+          <text class="vault-flow-label" x="34" y="142">Providerが固定キーを参照</text>
+          <text class="vault-flow-detail" x="34" y="160">AI Vault → Config Storeの書込専用キー</text>
+          <path class="vault-flow-link" d="M180 173v22m-5-5 5 5 5-5"/>
+          <rect class="vault-flow-box" x="20" y="197" width="320" height="47" rx="6"/>
+          <text class="vault-flow-label" x="34" y="217">組織内LLM APIへ転送</text>
+          <text class="vault-flow-detail" x="34" y="234">8モデルに同じ上流アプリキーを付与</text>
+        </svg>
+        <figcaption>今回の構成。1つのサービス資格情報を、対象GatewayのProviderが管理する。</figcaption>
+      </figure>
+      <figure class="card">
+        <svg viewBox="0 0 360 264" role="img" aria-labelledby="token-flow-title token-flow-desc">
+          <title id="token-flow-title">Token VaultでIdentityに応じた資格情報を交換する</title>
+          <desc id="token-flow-desc">GatewayがKong Identityの主体を認識し、Token Vaultで上流資格情報へ交換する。チーム別の共有キーや承認済みのユーザー別OAuthトークンを上流に使う。</desc>
+          <rect class="vault-flow-panel" x="1" y="1" width="358" height="262" rx="9"/>
+          <text class="vault-flow-title" x="20" y="31">Kong Identity Token Vault</text>
+          <rect class="vault-flow-box" x="20" y="49" width="320" height="47" rx="6"/>
+          <text class="vault-flow-label" x="34" y="69">AI Gatewayが呼び出し元を識別</text>
+          <text class="vault-flow-detail" x="34" y="86">Kong IdentityのPrincipalに紐づく資格情報</text>
+          <path class="vault-flow-link" d="M180 96v22m-5-5 5 5 5-5"/>
+          <rect class="vault-flow-highlight" x="20" y="120" width="320" height="53" rx="6"/>
+          <text class="vault-flow-label" x="34" y="142">Token Vaultで上流資格情報へ交換</text>
+          <text class="vault-flow-detail" x="34" y="160">共有キーの選択やユーザー別OAuthに対応</text>
+          <path class="vault-flow-link" d="M180 173v22m-5-5 5 5 5-5"/>
+          <rect class="vault-flow-box" x="20" y="197" width="320" height="47" rx="6"/>
+          <text class="vault-flow-label" x="34" y="217">選択した資格情報で上流へ転送</text>
+          <text class="vault-flow-detail" x="34" y="234">チーム別キーまたは本人のOAuthトークン</text>
+        </svg>
+        <figcaption>チーム別の上流権限や、本人に代わって外部APIを呼ぶ構成に適する。固定キーの共有にも使える。</figcaption>
+      </figure>
+    </div>
     <div class="card"><div class="table-scroll"><table>
       <thead><tr><th scope="col">項目</th><th scope="col">構成</th><th scope="col">宣言範囲と運用</th></tr></thead>
       <tbody>
         <tr><td>Config Store</td><td>Config Store → AI Vault → AI Model Providerの上流ヘッダー</td><td>Store、Secretの名前と入力参照、Vault、Provider、Model、Policyをkongctlで定義可能。キー値は実行時に安全な保管先から注入する。</td></tr>
-        <tr><td>Identity Token Vault</td><td>Directory → Vaultの公開鍵 → 共有 <code>static_secret</code> Provider → 対応するMCP Server</td><td>Provider・共有資格情報・公開鍵の宣言リソースがある。対になる秘密鍵の安全な生成・配布と上流キーの発行・失効は運用工程。HTTP Agent・AI Modelへ同じ方法で注入する対応は公式仕様で確認できなかった。</td></tr>
+        <tr><td>Identity Token Vault</td><td>Identity DirectoryとToken Vault Datastoreを使い、対応するAI Model ProviderやMCP Serverで上流資格情報を交換する。</td><td>Provider、共有資格情報、公開鍵の宣言が可能。チーム別のキー選択、対応するOAuthの同意・更新・失効、DP側に復号鍵を置く運用に価値がある。静的キーの発行・更新・失効は上流サービスで行う。</td></tr>
         <tr><td>クライアント認証</td><td>Gateway Consumerの入口キー</td><td>上流キーと異なる権限・有効期限を持つ。クライアントは入口キーだけを使い、Providerが上流APIキーを注入する。</td></tr>
       </tbody>
     </table></div></div>
-    <p>書込専用の秘密値は読戻しやdumpで比較できない。変更の検証には、秘密を出力せずに実行時の解決と上流への伝達を確認する。</p>
+    <p>すべての要求が共通キーを使う場合、Token Vaultで交換しても上流権限と費用計上の単位は同じ。Config StoreならIdentity Directory、交換経路、DP側の復号鍵の運用を加えずに、Gatewayが所有するキーを管理できる。上流の資格情報を利用者・チーム別に選ぶ要件や、復号権限を分ける要件が生じたらToken Vaultを評価する。</p>
+    <p>書込専用の秘密値は読戻しやdumpで比較できない。キー値を表示せず、実行時の解決と上流への伝達を確認する。</p>
   </section>
   <section id="deployment" aria-labelledby="deployment-title">
     <div class="section-head"><span class="section-number">04</span><div><h2 id="deployment-title">移行と検証</h2></div></div>
-    <p class="section-intro" id="pilot-results">全8件をAI Modelとして追加し、共通ProviderとConfig Storeの参照、DP同期、再planの差分0件を確認した。8経路すべてで入口キーなしの要求は401。Flash-Liteは入口キーだけを送信した合成リクエスト1回でHTTP 200、入力5・出力2トークンを確認した。他7件は登録・同期・未認証拒否まで。照会したCost ManagementイベントにFlash-Liteと同じリクエストIDは見つからなかった。</p>
+    <p class="section-intro" id="pilot-results">全8件をAI Modelとして追加し、共通ProviderとConfig Storeの参照、DP同期、再planの差分0件を確認した。8経路すべてで入口キーなしの要求は401。入口キーだけを送った合成リクエストは8件すべてHTTP 200で、合計で入力73・出力59トークンを確認した。Flash-Liteの初回照会で、同じリクエストIDはCost Managementイベントに見つからなかった。追加7件のイベントと上流の実費は照合していない。</p>
     <details class="card compact" open><summary>パイロットの状態と受入条件</summary>
       <ol>
         <li>Flash-Lite 1件を別パスのAI Modelとして構成し、既存HTTP Agentへの変更・削除がないことをplanで確認する。</li>
         <li>AI Model、Provider、Vaultの保存値とDP同期を読み戻す。無効な入口キー、許可外モデル、余分なパスの要求が上流に届かないことを確認する。</li>
         <li>推論の応答、必要なストリーム終端、使用量を確認する。Cost Managementの利用イベントと、上流側の費用計上は別々に照合する。</li>
-        <li>代表経路の疎通後に残り7件を登録した。呼び出し側は検証済みの用途から新しいURLへ移行できる。切り戻し用に既存HTTP AgentのURLを保持する。</li>
+        <li>新経路の疎通後、旧HTTP Agent 8件と旧経路専用のヘッダー変換ポリシー8件を無効化した。AI Modelと共有する入力検証ポリシー8件の有効状態を読み戻した。DP同期後、旧URLは8件とも404、新URLはキーなしで8件とも401。差分の再planは0件。</li>
       </ol>
     </details>
   </section>
   <section id="sources" aria-labelledby="sources-title">
     <div class="section-head"><span class="section-number">05</span><div><h2 id="sources-title">製品仕様と実測の範囲</h2></div></div>
     <div class="card">
-      <p>実測は単一Hybrid環境、限定したモデルと合成入力による。Config Storeを使う経路はFlash-Liteで推論を確認。Identity Token Vaultについては宣言スキーマと対応する実行時の接続先を確認した。</p>
+      <p>実測は単一Hybrid環境で、各モデル1回の合成入力による。Config Storeを使う経路は8モデルで推論を確認。Token Vaultは公式の構成例と対応する実行時実装を確認した。対象環境でのToken Vault経由の推論は未検証。</p>
       <ul>
         <li><a href="https://developer.konghq.com/ai-gateway/entities/ai-agent/">AI Agents</a> ・ <a href="https://developer.konghq.com/ai-gateway/entities/ai-model/">AI Models</a></li>
         <li><a href="https://developer.konghq.com/ai-gateway/entities/ai-vault/">AI VaultsとConfig Store</a> ・ <a href="https://developer.konghq.com/ai-gateway/entities/ai-model-provider/">AI Model Providers</a></li>
-        <li><a href="https://developer.konghq.com/identity/token-vault/">Kong Identity Token Vault</a> ・ <a href="https://developer.konghq.com/ai-gateway/entities/ai-mcp-server/">AI MCP Serverの上流認証</a></li>
+        <li><a href="https://developer.konghq.com/identity/token-vault/">Kong Identity Token Vault</a> ・ <a href="https://kong.github.io/kongctl/quickstarts/identity-token-vault/">AI Model Providerで共有の静的キーを使う公式例</a> ・ <a href="https://developer.konghq.com/ai-gateway/entities/ai-mcp-server/">AI MCP Serverの上流認証</a></li>
       </ul>
     </div>
   </section>
